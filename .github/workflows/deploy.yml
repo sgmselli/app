@@ -97,13 +97,13 @@ jobs:
       - name: Build and Push Frontend
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ needs.terraform.outputs.frontend_ecr_url }}:latest \
+            -t ${{ needs.terraform.outputs.FRONTEND_ECR_URL }}:latest \
             --push ./frontend
 
       - name: Build and Push Backend
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ needs.terraform.outputs.backend_ecr_url }}:latest \
+            -t ${{ needs.terraform.outputs.BACKEND_ECR_URL }}:latest \
             --push ./backend
 
  

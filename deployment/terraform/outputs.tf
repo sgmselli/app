@@ -28,8 +28,10 @@ output "aws_region" {
 
 output "frontend_ecr_url" {
   value = aws_ecr_repository.frontend.repository_url
+  sensitive = false
 }
 
 output "backend_ecr_url" {
   value = aws_ecr_repository.backend.repository_url
+  sensitive = false
 }
