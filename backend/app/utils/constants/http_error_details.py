@@ -1,0 +1,1 @@
+GENRE_NOT_FOUND_ERROR = 'Genre not found'

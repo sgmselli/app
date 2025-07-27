@@ -1,0 +1,39 @@
+services:
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # env_file:
+    #   - ./frontend/.env
+    ports:
+      - "80:80"
+
+  backend:
+    container_name: backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env 
+    ports:
+      - "8000:8000"
+
+  db:
+    container_name: db
+    image: postgres
+    volumes:
+      - db_data:/var/lib/postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_DB=guitardb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=db
+
+volumes:
+  db_data:
