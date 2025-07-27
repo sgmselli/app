@@ -14,8 +14,8 @@ jobs:
       contents: read
 
     outputs:
-      FRONTEND_ECR_URL: ${{ steps.tf_output.outputs.frontend_ecr_url }}
-      BACKEND_ECR_URL: ${{ steps.tf_output.outputs.backend_ecr_url }}
+      frontend_ecr_url: ${{ steps.tf_output.outputs.frontend_ecr_url }}
+      backend_ecr_url: ${{ steps.tf_output.outputs.backend_ecr_url }}
 
     env:
       AWS_REGION: 'eu-west-2'
@@ -54,6 +54,12 @@ jobs:
           echo "backend_ecr_url=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
         working-directory: deployment/terraform
 
+      - name: Echo ECR URLs
+        run: |
+          echo "Frontend: ${{ steps.tf_output.outputs.frontend_ecr_url }}"
+          echo "Backend: ${{ steps.tf_output.outputs.backend_ecr_url }}
+
+
   docker:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
@@ -85,19 +91,19 @@ jobs:
 
       - name: Echo ECR URLs
         run: |
-          echo "Frontend: ${{ needs.terraform.outputs.FRONTEND_ECR_URL }}"
-          echo "Backend: ${{ needs.terraform.outputs.BACKEND_ECR_URL }}"
+          echo "Frontend: ${{ needs.terraform.outputs.frontend_ecr_url }}"
+          echo "Backend: ${{ needs.terraform.outputs.backend_ecr_url }}"
 
       - name: Build and Push Frontend
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ needs.terraform.outputs.FRONTEND_ECR_URL }}:latest \
+            -t ${{ needs.terraform.outputs.frontend_ecr_url }}:latest \
             --push ./frontend
 
       - name: Build and Push Backend
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ needs.terraform.outputs.BACKEND_ECR_URL }}:latest \
+            -t ${{ needs.terraform.outputs.backend_ecr_url }}:latest \
             --push ./backend
 
  
