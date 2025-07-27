@@ -33,6 +33,8 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
 
       - name: Terraform Init
         run: terraform init
@@ -50,7 +52,6 @@ jobs:
       - name: Terraform Output
         id: tf_output
         run: |
-          unset TF_LOG
           echo "frontend_ecr_url=$(terraform output -raw frontend_ecr_url)" >> $GITHUB_OUTPUT
           echo "backend_ecr_url=$(terraform output -raw backend_ecr_url)" >> $GITHUB_OUTPUT
         working-directory: deployment/terraform
