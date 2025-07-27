@@ -46,8 +46,8 @@ jobs:
       - name: Terraform Output
         id: tf_output
         run: |
-          echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url)" >> $GITHUB_OUTPUT
-          echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url)" >> $GITHUB_OUTPUT
+          echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
         working-directory: deployment/terraform
 
   docker:
