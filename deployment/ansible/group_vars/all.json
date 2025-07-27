@@ -1,0 +1,42 @@
+{
+  "availability_zone": {
+    "sensitive": false,
+    "type": "string",
+    "value": "eu-west-2a"
+  },
+  "aws_account_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "183317994928"
+  },
+  "aws_region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "eu-west-2"
+  },
+  "backend_ecr_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "183317994928.dkr.ecr.eu-west-2.amazonaws.com/backend"
+  },
+  "frontend_ecr_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "183317994928.dkr.ecr.eu-west-2.amazonaws.com/frontend"
+  },
+  "instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-02f7e6b3a4e0c020c"
+  },
+  "public_dns": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ec2-3-10-179-31.eu-west-2.compute.amazonaws.com"
+  },
+  "public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3.10.179.31"
+  }
+}
