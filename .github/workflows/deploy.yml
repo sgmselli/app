@@ -14,8 +14,8 @@ jobs:
       contents: read
 
     outputs:
-      FRONTEND_ECR_URL: ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}
-      BACKEND_ECR_URL: ${{ steps.tf_output.outputs.BACKEND_ECR_URL }}
+      FRONTEND_ECR_URL: ${{ steps.tf_output.outputs.frontend_ecr_url }}
+      BACKEND_ECR_URL: ${{ steps.tf_output.outputs.backend_ecr_url }}
 
     env:
       AWS_REGION: 'eu-west-2'
@@ -50,8 +50,8 @@ jobs:
       - name: Terraform Output
         id: tf_output
         run: |
-          echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url  | tr -d '\r\n')" >> $GITHUB_OUTPUT
-          echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "frontend_ecr_url=$(terraform output -raw frontend_ecr_url  | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "backend_ecr_url=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
         working-directory: deployment/terraform
 
   docker:
@@ -82,6 +82,11 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Echo ECR URLs
+        run: |
+          echo "Frontend: ${{ needs.terraform.outputs.FRONTEND_ECR_URL }}"
+          echo "Backend: ${{ needs.terraform.outputs.BACKEND_ECR_URL }}"
 
       - name: Build and Push Frontend
         run: |
