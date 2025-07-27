@@ -15,11 +15,7 @@ jobs:
 
     env:
       AWS_REGION: 'eu-west-2'
-
-    outputs:
-      FRONTEND_ECR_URL: ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}
-      BACKEND_ECR_URL: ${{ steps.tf_output.outputs.BACKEND_ECR_URL }}
-
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,8 +46,8 @@ jobs:
       - name: Terraform Output
         id: tf_output
         run: |
-          echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url)" >> "$GITHUB_OUTPUT"
-          echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url)" >> "$GITHUB_OUTPUT"
+          echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url)" >> $GITHUB_OUTPUT
+          echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url)" >> $GITHUB_OUTPUT
         working-directory: deployment/terraform
 
   docker:
