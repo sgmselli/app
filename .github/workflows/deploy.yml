@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  terraform:
+  set-up:
     name: Set up
     runs-on: ubuntu-latest
 
@@ -32,20 +32,15 @@ jobs:
         with:
           terraform_wrapper: false
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: deployment/terraform
-
-      - name: Terraform Plan
-        run: terraform plan
-        working-directory: deployment/terraform
-
-      - name: Terraform Apply
+      - name: Apply Terraform
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: |
+          terraform init
+          terraform plan
+          terraform apply -auto-approve
         working-directory: deployment/terraform
 
-      - name: Terraform Output
+      - name: Store ECR URLS from Terraform output
         id: tf_output
         run: |
           echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url)" >> $GITHUB_OUTPUT
@@ -67,7 +62,7 @@ jobs:
       - name: Build and Push Backend
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}:latest \
+            -t ${{ steps.tf_output.outputs.BACKEND_ECR_URL }}:latest \
             --push ./backend
 
  
