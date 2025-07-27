@@ -57,8 +57,7 @@ jobs:
 
       - name: Echo ECR URLs
         run: |
-          echo "Frontend: ${{ steps.tf_output.outputs.frontend_ecr_url }}"
-          echo "Backend: ${{ steps.tf_output.outputs.backend_ecr_url }}"
+          echo "$(terraform output -raw frontend_ecr_url)"
 
 
   docker:
