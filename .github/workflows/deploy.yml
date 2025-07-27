@@ -51,8 +51,8 @@ jobs:
         id: tf_output
         run: |
           unset TF_LOG
-          echo "frontend_ecr_url=$(terraform output -raw frontend_ecr_url  | tr -d '\r\n')" >> $GITHUB_OUTPUT
-          echo "backend_ecr_url=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "frontend_ecr_url=$(terraform output -raw frontend_ecr_url  | tr -d '\r\n')" >> "$GITHUB_OUTPUT"
+          echo "backend_ecr_url=$(terraform output -raw backend_ecr_url | tr -d '\r\n')" >> "$GITHUB_OUTPUT"
         working-directory: deployment/terraform
 
       - name: Echo ECR URLs
