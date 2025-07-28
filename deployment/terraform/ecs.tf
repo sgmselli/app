@@ -110,7 +110,7 @@ resource "aws_ecs_service" "frontend" {
   desired_count   = 1
 
   network_configuration {
-    subnets         = data.aws_subnets.public.ids
+    subnets         = data.aws_subnets.default.ids
     assign_public_ip = true
     security_groups = [aws_security_group.ecs_sg.id]
   }
