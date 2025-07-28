@@ -5,8 +5,8 @@ on:
     branches: [main]
 
 jobs:
-  set-up:
-    name: Set up
+  deploy-app:
+    name: Deploy App
     runs-on: ubuntu-latest
 
     permissions:
@@ -15,6 +15,7 @@ jobs:
 
     env:
       AWS_REGION: 'eu-west-2'
+      ECS_CLUSTER_NAME: 'app-cluster'
       
     steps:
       - name: Checkout
@@ -64,5 +65,21 @@ jobs:
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t ${{ steps.tf_output.outputs.BACKEND_ECR_URL }}:latest \
             --push ./backend
+
+      - name: Force ECS frontend service to redeploy
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER_NAME \
+            --service frontend-service \
+            --force-new-deployment \
+            --region $AWS_REGION
+
+      - name: Force ECS backend service to redeploy
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER_NAME \
+            --service backend-service \
+            --force-new-deployment \
+            --region $AWS_REGION
 
  
