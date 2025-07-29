@@ -60,6 +60,16 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = var.ecs_task_execution_policy_arn
 }
 
+resource "aws_cloudwatch_log_group" "ecs_frontend" {
+  name              = "/ecs/frontend"
+  retention_in_days = 1
+}
+
+resource "aws_cloudwatch_log_group" "ecs_backend" {
+  name              = "/ecs/backend"
+  retention_in_days = 1
+}
+
 # ECS Task Definition (Frontend)
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "frontend-task"
@@ -80,6 +90,14 @@ resource "aws_ecs_task_definition" "frontend" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+            awslogs-group         = aws_cloudwatch_log_group.ecs_frontend.name,
+            awslogs-region        = var.region,
+            awslogs-stream-prefix = "frontend"
+        }
+      }
     }
   ])
 }
@@ -104,6 +122,14 @@ resource "aws_ecs_task_definition" "backend" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+            awslogs-group         = aws_cloudwatch_log_group.ecs_backend.name,
+            awslogs-region        = var.region,
+            awslogs-stream-prefix = "backend"
+        }
+      }
     }
   ])
 }

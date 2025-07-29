@@ -9,7 +9,8 @@ services:
     #   - ./frontend/.env
     ports:
       - "80:80"
-
+    environment:
+      - ENVIRONMENT=development
   backend:
     container_name: backend
     build: 

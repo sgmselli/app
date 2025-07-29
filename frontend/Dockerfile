@@ -16,14 +16,15 @@ FROM nginx:1.29.0-alpine
 # RUN adduser -D myuser
 
 # Copy custom Nginx config
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/development/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/production/default.conf /etc/nginx/conf.d/default.conf
 
 # Copy the build output from React
 COPY --from=build ./frontend/build /usr/share/nginx/html
 
-# RUN chown -R myuser:myuser /usr/share/nginx/html /var/cache/nginx /var/run/nginx
-# USER myuser
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["./run.sh"]
