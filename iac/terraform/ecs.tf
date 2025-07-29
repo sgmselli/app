@@ -11,7 +11,7 @@ resource "aws_ecs_cluster" "main" {
 }
 
 # Security group for ECS tasks 
-resource "aws_security_group" "ecs_sg" {
+resource "aws_security_group" "frontend_sg" {
   name        = "ecs-task-sg"
   description = "Allow HTTP"
   vpc_id      = data.aws_vpc.default.id
@@ -23,18 +23,27 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "backend_sg" {
+  ingress {
+    from_port       = 8000
+    to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [data.aws_vpc.default.cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
 }
 
@@ -146,6 +155,13 @@ resource "aws_ecs_task_definition" "backend" {
   ])
 }
 
+resource "aws_service_discovery_private_dns_namespace" "namespace" {
+  name        = "local"
+  description = "Private DNS namespace for ECS"
+  vpc         = data.aws_vpc.default.id
+}
+
+
 # ECS Service (Frontend)
 resource "aws_ecs_service" "frontend" {
   name            = "frontend-service"
@@ -157,10 +173,24 @@ resource "aws_ecs_service" "frontend" {
   network_configuration {
     subnets          = data.aws_subnets.default.ids
     assign_public_ip = true
-    security_groups  = [aws_security_group.ecs_sg.id]
+    security_groups  = [aws_security_group.frontend_sg.id]
   }
 
   depends_on = [aws_ecs_cluster.main]
+}
+
+resource "aws_service_discovery_service" "backend" {
+  name = "backend"
+
+  dns_config {
+    namespace_id   = aws_service_discovery_private_dns_namespace.namespace.id
+    routing_policy = "MULTIVALUE"
+
+    dns_records {
+      type = "A"
+      ttl  = 10
+    }
+  }
 }
 
 # ECS Service (Backend)
@@ -173,8 +203,8 @@ resource "aws_ecs_service" "backend" {
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
-    assign_public_ip = true
-    security_groups  = [aws_security_group.ecs_sg.id]
+    assign_public_ip = false
+    security_groups  = [aws_security_group.backend_sg.id]
   }
 
   depends_on = [aws_ecs_cluster.main]
