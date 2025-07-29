@@ -128,10 +128,10 @@ resource "aws_ecs_task_definition" "backend" {
           protocol      = "tcp"
         }
       ]
-      secrets = [
+      environment = [
         {
-          name      = "DATABASE_URL"
-          valueFrom = "postgresql://postgres:password@db:5432/db"
+          name  = "DATABASE_URL"
+          value = "postgres://user:pass@host:5432/db"
         }
       ],
       logConfiguration = {
