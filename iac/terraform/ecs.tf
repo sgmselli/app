@@ -182,7 +182,7 @@ resource "aws_ecs_service" "frontend" {
   depends_on = [aws_ecs_cluster.main]
 }
 
-resource "aws_service_discovery_service" "backend" {
+resource "aws_service_discovery_service" "backend_discovery_service" {
   name = "backend"
 
   dns_config {
@@ -208,6 +208,10 @@ resource "aws_ecs_service" "backend" {
     subnets          = data.aws_subnets.default.ids
     assign_public_ip = false
     security_groups  = [aws_security_group.backend_sg.id]
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.backend_discovery_service.arn
   }
 
   depends_on = [aws_ecs_cluster.main]
