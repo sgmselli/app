@@ -131,7 +131,7 @@ resource "aws_ecs_task_definition" "backend" {
       environment = [
         {
           name  = "DATABASE_URL"
-          value = "postgres://user:pass@host:5432/db"
+          value = "postgresql://postgres:password@db:5432/db"
         }
       ],
       logConfiguration = {
