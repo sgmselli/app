@@ -74,15 +74,15 @@ resource "aws_cloudwatch_log_group" "ecs_backend" {
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "frontend-task"
   requires_compatibilities = ["FARGATE"]
-  network_mode            = "awsvpc"
-  cpu                     = "256"  
-  memory                  = "512"  
-  execution_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
-      name      = "frontend"
-      image     = "${aws_ecr_repository.frontend.repository_url}:latest"
+      name  = "frontend"
+      image = "${aws_ecr_repository.frontend.repository_url}:latest"
       portMappings = [
         {
           containerPort = 80
@@ -90,12 +90,18 @@ resource "aws_ecs_task_definition" "frontend" {
           protocol      = "tcp"
         }
       ]
+      environment = [
+        {
+          name  = "ENVIRONMENT"
+          value = "production"
+        }
+      ],
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-            awslogs-group         = aws_cloudwatch_log_group.ecs_frontend.name,
-            awslogs-region        = var.region,
-            awslogs-stream-prefix = "frontend"
+          awslogs-group         = aws_cloudwatch_log_group.ecs_frontend.name,
+          awslogs-region        = var.region,
+          awslogs-stream-prefix = "frontend"
         }
       }
     }
@@ -106,15 +112,15 @@ resource "aws_ecs_task_definition" "frontend" {
 resource "aws_ecs_task_definition" "backend" {
   family                   = "backend-task"
   requires_compatibilities = ["FARGATE"]
-  network_mode            = "awsvpc"
-  cpu                     = "256"  
-  memory                  = "512"  
-  execution_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
-      name      = "backend"
-      image     = "${aws_ecr_repository.backend.repository_url}:latest"
+      name  = "backend"
+      image = "${aws_ecr_repository.backend.repository_url}:latest"
       portMappings = [
         {
           containerPort = 8000
@@ -122,12 +128,18 @@ resource "aws_ecs_task_definition" "backend" {
           protocol      = "tcp"
         }
       ]
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = "postgresql://postgres:password@db:5432/db"
+        }
+      ],
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-            awslogs-group         = aws_cloudwatch_log_group.ecs_backend.name,
-            awslogs-region        = var.region,
-            awslogs-stream-prefix = "backend"
+          awslogs-group         = aws_cloudwatch_log_group.ecs_backend.name,
+          awslogs-region        = var.region,
+          awslogs-stream-prefix = "backend"
         }
       }
     }
@@ -143,9 +155,9 @@ resource "aws_ecs_service" "frontend" {
   desired_count   = 1
 
   network_configuration {
-    subnets         = data.aws_subnets.default.ids
+    subnets          = data.aws_subnets.default.ids
     assign_public_ip = true
-    security_groups = [aws_security_group.ecs_sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
   }
 
   depends_on = [aws_ecs_cluster.main]
@@ -160,9 +172,9 @@ resource "aws_ecs_service" "backend" {
   desired_count   = 1
 
   network_configuration {
-    subnets         = data.aws_subnets.default.ids
+    subnets          = data.aws_subnets.default.ids
     assign_public_ip = true
-    security_groups = [aws_security_group.ecs_sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
   }
 
   depends_on = [aws_ecs_cluster.main]

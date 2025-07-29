@@ -9,6 +9,6 @@ else
 fi
 
 # Prevent Nginx from reading both configs
-rm -f /etc/nginx/conf.d/default.dev.conf /etc/nginx/conf.d/default.prod.conf
+rm -f /etc/nginx/conf.d/development/default.conf /etc/nginx/conf.d/production/default.conf
 
 exec nginx -g 'daemon off;'
