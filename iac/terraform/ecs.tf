@@ -12,8 +12,8 @@ resource "aws_ecs_cluster" "main" {
 
 # Security group for ECS tasks 
 resource "aws_security_group" "frontend_sg" {
-  name        = "ecs-task-sg"
-  description = "Allow HTTP"
+  name        = "ecs-frontend-sg"
+  description = "Allow HTTP to frontend"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -32,11 +32,14 @@ resource "aws_security_group" "frontend_sg" {
 }
 
 resource "aws_security_group" "backend_sg" {
+  name        = "ecs-backend-sg"
+  description = "Allow only internal access to backend"
+
   ingress {
     from_port       = 8000
     to_port         = 8000
     protocol        = "tcp"
-    security_groups = [data.aws_vpc.default.cidr_block]
+    security_groups = [aws_security_group.frontend_sg.id]
   }
 
   egress {
