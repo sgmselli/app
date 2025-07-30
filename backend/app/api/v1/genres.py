@@ -15,6 +15,10 @@ from app.crud import genre as crud_genre
 router = APIRouter()
 
 
+@router.get("/test", status_code=HTTP_200_OK)  
+async def test():
+    return {'test':'test'}
+
 @router.post("/", response_model=GenreOut, status_code=HTTP_201_CREATED)  
 async def create(genre_in: GenreCreate, db: Session = Depends(get_db)):
     return crud_genre.create_genre(

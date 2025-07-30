@@ -20,6 +20,8 @@ services:
       - ./backend/.env 
     ports:
       - "8000:8000"
+    environment:
+      - APP_ENV=DEVELOPMENT
 
   db:
     container_name: db

@@ -16,6 +16,10 @@ FROM nginx:1.29.0-alpine
 # RUN adduser -D myuser
 
 # Copy custom Nginx config
+
+# Copy custom Nginx conf
+COPY ./nginx/development/nginx.conf /etc/nginx/development/nginx.conf
+COPY ./nginx/production/nginx.conf /etc/nginx/production/nginx.conf
 COPY ./nginx/development/default.conf /etc/nginx/conf.d/development/default.conf
 COPY ./nginx/production/default.conf /etc/nginx/conf.d/production/default.conf
 

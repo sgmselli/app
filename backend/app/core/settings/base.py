@@ -1,12 +1,20 @@
 from enum import Enum
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
+from typing import Optional
 
 class AppEnvTypes(Enum):
     PRODUCTION: str = 'PRODUCTION'
     DEVELOPMENT: str = 'DEVELOPMENT'
     TEST: str = 'TEST'
 
+env = os.getenv("APP_ENV", "DEVELOPMENT").upper()
+
+try:
+    selected_env = AppEnvTypes(env)
+except ValueError:
+    selected_env = AppEnvTypes.DEVELOPMENT 
+
 class BaseAppSettings(BaseSettings):
-    # model_config = SettingsConfigDict(env_file='.env')
-    app_env: AppEnvTypes = AppEnvTypes.DEVELOPMENT
-    database_url: str = 'postgresql://postgres:password@khkjkhkjhj:5432/guitardb'
+    app_env: AppEnvTypes = selected_env
+    database_url: Optional[str] = None

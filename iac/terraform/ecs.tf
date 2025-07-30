@@ -142,6 +142,10 @@ resource "aws_ecs_task_definition" "backend" {
       ]
       environment = [
         {
+          name  = "APP_ENV"
+          value = "PRODUCTION"
+        },
+        {
           name  = "DATABASE_URL"
           value = "postgresql://postgres:password@db:5432/db"
         }
