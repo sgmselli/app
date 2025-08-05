@@ -10,7 +10,6 @@ class CreatorProfile(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     creator_id = Column(Integer, ForeignKey("creators.id"), nullable=False, unique=True)
-    slug = Column(String(50), nullable=False, unique=True, index=True)
     display_name = Column(String, nullable=False)
     bio = Column(Text, nullable=True)
     image_url = Column(String, nullable=True)

@@ -3,13 +3,21 @@ from fastapi import HTTPException
 
 from app.schemas.creator import CreatorCreate
 from app.models.creator import Creator
-from app.auth.security import hash_password
+from app.utils.auth import hash_password
 from app.utils.constants.http_codes import (
     HTTP_400_BAD_REQUEST
 )
+from app.utils.logging import Logger, LogLevel
+from app.utils.constants.http_error_details import CREATOR_NOT_FOUND_ERROR
 
-def get_creator(db: Session):
-    pass
+def get_creator(db: Session, email: str):
+    creator = db.query(Creator).filter(email == email).first()
+
+    if not creator:
+        Logger.log(LogLevel.ERROR, f"Could not find the creator with email {email} on get request.")
+        raise ValueError(CREATOR_NOT_FOUND_ERROR)
+    
+    return creator
     
 def create_creator(db: Session, creator_in: CreatorCreate):
 

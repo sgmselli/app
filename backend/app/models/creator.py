@@ -12,6 +12,7 @@ class Creator(Base):
     __tablename__ = 'creators'
 
     id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     auth_provider = Column(Enum(AuthProvider), default=AuthProvider.PASSWORD, nullable=False)
     password_hash = Column(String, nullable=True)

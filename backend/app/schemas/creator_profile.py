@@ -3,7 +3,6 @@ from typing import Optional
 from datetime import datetime
 
 class CreatorProfileBase(BaseModel):
-    slug: str
     display_name: str
     bio: Optional[str] = None
     image_url: Optional[str] = None
