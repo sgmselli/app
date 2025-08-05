@@ -1,1 +1,3 @@
-read me
+Tech debt
+
+- black list 

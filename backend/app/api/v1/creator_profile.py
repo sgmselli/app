@@ -15,12 +15,12 @@ from app.crud import creator_profile as crud_creator_profile
 
 router = APIRouter()
 
-@router.get("/{slug}", response_model=CreatorProfileOut, status_code=HTTP_200_OK)
-def get(slug: str, db: Session = Depends(get_db)):
+@router.get("/{username}", response_model=CreatorProfileOut, status_code=HTTP_200_OK)
+def get(username: str, db: Session = Depends(get_db)):
     try:
         return crud_creator_profile.get_creator_profile(
             db=db,
-            slug=slug
+            username=username
         )
     except ValueError as e:
         raise HTTPException(

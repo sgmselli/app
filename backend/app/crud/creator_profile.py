@@ -12,11 +12,11 @@ from app.utils.constants.http_codes import (
     HTTP_500_INTERNAL_SERVER_ERROR
 )
 
-def get_creator_profile(db: Session, slug: str):
-    creator_profile = db.query(CreatorProfile).filter(slug == slug).first()
+def get_creator_profile(db: Session, username: str):
+    creator_profile = db.query(CreatorProfile).filter(username == username).first()
 
     if not creator_profile:
-        Logger.log(LogLevel.ERROR, f"Could not find the creator profile with slug {slug} on get request.")
+        Logger.log(LogLevel.ERROR, f"Could not find the creator profile with username {username} on get request.")
         raise ValueError(CREATOR_PROFILE_NOT_FOUND_ERROR)
     
     return creator_profile
@@ -34,7 +34,6 @@ def create_creator_profile(db: Session, creator_profile_in: CreatorProfileCreate
     
     creator_profile = CreatorProfile(
         creator_id = creator_id,
-        slug = creator_profile_in.slug,
         display_name = creator_profile_in.display_name,
         bio = creator_profile_in.bio,
         image_url = creator_profile_in.image_url,
@@ -47,7 +46,7 @@ def create_creator_profile(db: Session, creator_profile_in: CreatorProfileCreate
 
     except IntegrityError as e:
         db.rollback()
-        # Check for FK violaton or unique slug violation by inspecting e.orig or e.args
+        # Check for FK violaton or unique username violation by inspecting e.orig or e.args
         error_message = str(e.orig).lower()
         if "foreign key constraint" in error_message:
             raise HTTPException(

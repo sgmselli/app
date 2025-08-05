@@ -7,7 +7,7 @@ GET /creator/{id}/tips
 creator:
 POST /creator/profile 
 PATCH /creator/profile
-GET /@{slug}
+GET /@{username}
 
 payouts
 POST /payouts
