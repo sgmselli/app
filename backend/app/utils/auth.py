@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -18,6 +19,7 @@ from app.utils.logging import Logger, LogLevel
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+optional_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 ACCESS_SECRET_KEY = settings.access_secret_key
 REFRESH_SECRET_KEY = settings.refresh_secret_key
@@ -59,7 +61,7 @@ def decode_refresh_token(token: str):
         return None
 
 def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)) -> Creator:
-    from app.crud.creator import get_creator
+    from app.crud.creator import get_creator_by_email
 
     credentials_exception = HTTPException(
         status_code=HTTP_401_UNAUTHORIZED,
@@ -76,8 +78,25 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)) ->
     except JWTError:
         raise credentials_exception
 
-    user = get_creator(db, email)
+    user = get_creator_by_email(db, email)
     if user is None:
         raise credentials_exception
 
     return user
+
+# def get_current_user_optional(token: Optional[str] = Depends(optional_oauth2_scheme, auto_error=False), db: Session = Depends(get_db)) -> Optional[Creator]:
+#     from app.crud.creator import get_creator_by_email
+
+#     if token is None:
+#         return None 
+
+#     try:
+#         payload = jwt.decode(token, ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
+#         email: str = payload.get("sub")
+#         if email is None:
+#             return None
+#     except JWTError:
+#         return None
+
+#     user = get_creator_by_email(db, email)
+#     return user  

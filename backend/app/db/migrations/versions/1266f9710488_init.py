@@ -1,8 +1,8 @@
-"""empty message
+"""init
 
-Revision ID: bd8fc7df9abb
+Revision ID: 1266f9710488
 Revises: 
-Create Date: 2025-08-05 16:03:12.967161
+Create Date: 2025-08-07 16:01:16.838940
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bd8fc7df9abb'
+revision: str = '1266f9710488'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=50), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
-    sa.Column('auth_provider', sa.Enum('PASSWORD', 'GOOGLE', name='authprovider'), nullable=False),
+    sa.Column('auth_provider', sa.Enum('PASSWORD', name='authprovider', native_enum=False), nullable=False),
     sa.Column('password_hash', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -45,6 +45,7 @@ def upgrade() -> None:
     sa.Column('bio', sa.Text(), nullable=True),
     sa.Column('image_url', sa.String(), nullable=True),
     sa.Column('stripe_account_id', sa.String(), nullable=True),
+    sa.Column('country', sa.Enum('Australia', 'Austria', 'Belgium', 'Brazil', 'Bulgaria', 'Canada', 'Cyprus', 'CzechRepublic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Ghana', 'Gibraltar', 'Greece', 'HongKong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Italy', 'Japan', 'Kenya', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Mexico', 'Netherlands', 'NewZealand', 'Norway', 'Poland', 'Portugal', 'Romania', 'Singapore', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'UnitedArabEmirates', 'UnitedKingdom', 'UnitedStates', 'Uruguay', name='country', native_enum=False), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['creator_id'], ['creators.id'], ),
     sa.PrimaryKeyConstraint('id'),
