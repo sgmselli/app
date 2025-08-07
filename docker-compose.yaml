@@ -27,13 +27,13 @@ services:
     container_name: db
     image: postgres
     volumes:
-      - db_data:/var/lib/postgres
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     expose:
       - "5432"
     environment:
-      - POSTGRES_DB=guitardb
+      - POSTGRES_DB=tiptubedb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=db
