@@ -9,7 +9,7 @@ class CreatorProfileBase(BaseModel):
     stripe_account_id:Optional[str] = None
 
 class CreatorProfileCreate(CreatorProfileBase):
-    creator_id: int
+    pass
 
 class CreatorProfileUpdate(BaseModel):
     display_name: str

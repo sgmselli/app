@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
@@ -13,25 +13,16 @@ from app.utils.constants.http_codes import (
 )
 
 def get_creator_profile(db: Session, username: str):
-    creator_profile = db.query(CreatorProfile).filter(username == username).first()
+    creator = db.query(Creator).options(joinedload(Creator.profile)).filter(Creator.username == username).first()
 
-    if not creator_profile:
+    if not creator or not creator.profile:
         Logger.log(LogLevel.ERROR, f"Could not find the creator profile with username {username} on get request.")
         raise ValueError(CREATOR_PROFILE_NOT_FOUND_ERROR)
+
+    return creator.profile
     
-    return creator_profile
 
-def create_creator_profile(db: Session, creator_profile_in: CreatorProfileCreate):
-
-    creator_id = creator_profile_in.creator_id
-
-    creator = db.query(Creator).filter(Creator.id == creator_id).first()
-    if not creator:
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST,
-            detail=f"Creator with id {creator_id} does not exist."
-        )
-    
+def create_creator_profile(db: Session, creator_id: int, creator_profile_in: CreatorProfileCreate): 
     creator_profile = CreatorProfile(
         creator_id = creator_id,
         display_name = creator_profile_in.display_name,

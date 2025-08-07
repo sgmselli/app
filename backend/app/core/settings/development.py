@@ -4,6 +4,8 @@ from pydantic_settings import SettingsConfigDict
 class DevelopmentSettings(AppSettings):
     debug: bool = True
     database_url: str = "postgresql://postgres:password@db:5432/guitardb"
+    stripe_return_url: str = "http://localhost/stripe/connect/success"
+    stripe_refresh_url: str = "http://localhost/stripe/connect/failure"
     model_config = SettingsConfigDict(
         env_file='.env'
     )

@@ -5,6 +5,7 @@ from app.models.creator import AuthProvider
 
 class CreatorCreate(BaseModel):
     email: str
+    username: str
     auth_provider: Optional[AuthProvider] = None
     password_hash: Optional[str] = None
 
@@ -16,6 +17,7 @@ class CreatorUpdate(BaseModel):
 class CreatorOut(BaseModel):
     id: int
     email: str
+    username: str
 
     class Config:
         from_attributes = True
