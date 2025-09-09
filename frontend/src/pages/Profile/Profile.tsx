@@ -1,33 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Params, useNavigate } from 'react-router-dom';
+import { Link as LinkIcon, ChevronDown } from "lucide-react";
+
 import { getCreatorProfile } from '../../api/profile';
 import Donate from './components/Donate';
-import Tips, { TipProps } from './components/Tips';
+import Tips from './components/Tips';
 import { useAuth } from '../../contexts/AuthContext';
 import { getCurrencySymbol } from '../../components/currencySymbolConverter';
-// import Navbar from '../../components/Navbar';
-
-import youtubeBanner from '../../assets/images/youtube_banner.jpg'
-
-import { Link as LinkIcon } from "lucide-react";
 import ProfileFooter from './components/ProfileFooter';
 import ProfileNavbar from './components/ProfileNavbar';
+import TipsModal from './components/TipModal';
+import type { Tip } from '../../types/tip';
 
 const Profile: React.FC = () => {
     const { username }: Readonly<Params<string>> = useParams();
+    const [id, setId] = useState<number | null>(null);
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [bio, setBio] = useState<string | null>(null);
     const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
     const [profileBannerUrl, setProfileBannerUrl] = useState<string | null>(null);
     const [youtubeChannelName, setYoutubeChannelName] = useState<string | null>(null);
     const [currency, setCurrency] = useState<string | null>(null)
-    const [tips, setTips] = useState<TipProps[]>([]);
+    const [tips, setTips] = useState<Tip[]>([]);
     const [numberOfTips, setNumberOfTips] = useState<number>(0)
     const [bankConnected, setBankConnected] = useState<boolean | null>(null)
 
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { isAuthenticated, loadingUser, logoutUser, user } = useAuth();
     const navigate = useNavigate();
@@ -47,7 +48,7 @@ const Profile: React.FC = () => {
                     setProfilePictureUrl(profile.profile_picture_url)
                     setProfileBannerUrl(profile.profile_banner_url)
                     setBankConnected(profile.is_bank_connected)
-                    console.log(profile.tips)
+                    setId(profile.id)
                 } catch (err: any) {
                     console.log(err)
                     setError(err.response?.data?.error || "TubeTip profile does not exist");
@@ -116,19 +117,27 @@ const Profile: React.FC = () => {
                             <p className="text-md mt-2">{bio}</p>
                         </div>
 
-                        {/* Tips Section */}
-                        <div className="flex flex-col shadow-md rounded-xl bg-white p-6">
-                            <h2 className="text-xl font-medium">Recent tips</h2>
-                            {numberOfTips === 0 ? (
-                            <div className="p-6 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
-                                <p className="text-gray-700 text-center text-sm">
-                                Be the first one to tip {displayName}.
-                                </p>
+                            {/* Tips Section */}
+                            <div className="flex flex-col shadow-md rounded-xl bg-white p-6">
+                                <h2 className="text-xl font-medium">Recent tips</h2>
+                                {numberOfTips === 0 ? (
+                                <div className="p-6 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
+                                    <p className="text-gray-700 text-center text-sm">
+                                    Be the first one to tip {displayName}.
+                                    </p>
+                                </div>
+                                ) : (
+                                <Tips tips={tips} />
+                                )}
+                                <button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="btn btn-lg btn-neutral hover:text-white btn-outline text-[16px] font-normal rounded-full mt-2 flex items-center gap-2"
+                                >
+                                    See more tips
+                                    <ChevronDown size={18} />
+                                </button>
+                                <TipsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} id={id} />
                             </div>
-                            ) : (
-                            <Tips tips={tips} />
-                            )}
-                        </div>
 
                         </div>
 
