@@ -1,12 +1,14 @@
 from pydantic import BaseModel 
+from typing import Optional
 
 from app.models.creator_profile import Country
 
-class StripeCreateAccountLink(BaseModel):
+class BankConnectPayload(BaseModel):
     country: Country
 
-class StripeCheckoutLink(BaseModel):
+class StripeCheckoutPayload(BaseModel):
     username: str
     payment_amount: float
-    message: str
-    private: bool
+    name: Optional[str] = None
+    message: Optional[str] = None
+    isPrivate: bool

@@ -11,8 +11,9 @@ class Tip(Base):
     id = Column(Integer, primary_key=True, index=True)
     creator_profile_id = Column(Integer, ForeignKey("creator_profiles.id"), nullable=False)
     amount = Column(Integer, nullable=False)
+    name = Column(String, nullable=True)
     message = Column(String, nullable=True)
-    private = Column(Boolean, nullable=False, default=False)
+    isPrivate = Column(Boolean, nullable=False, default=False)
     stripe_session_id = Column(String, unique=True, nullable=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc).isoformat())
 

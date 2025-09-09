@@ -1,58 +1,91 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, Response, Cookie 
+from fastapi.security import OAuth2PasswordRequestForm
+from uuid import uuid4
 
-from app.crud.creator import get_creator_by_email
+from app.core import settings
+from app.crud.creator import get_user_by_email
 from app.db.session import get_db
 from app.utils.auth import verify_password
 from app.utils.constants.http_codes import (
-    HTTP_401_UNAUTHORIZED
+    HTTP_204_NO_CONTENT,
+    HTTP_401_UNAUTHORIZED, 
 )
 from app.utils.constants.http_error_details import (
     INVALID_LOGIN_CREDENTIALS_ERROR,
-    INVALID_REFRESH_TOKEN_ERROR,
-    INVALID_SUB_ERROR
 )
-from app.utils.auth import create_access_token, create_refresh_token, decode_refresh_token, get_current_user
-from app.db.base import Creator
-from app.schemas.tokens import TokenRefreshRequest
+from app.utils.auth import create_access_token, create_refresh_token, decode_refresh_token, store_tokens, store_access_token
 from app.utils.logging import Logger, LogLevel
 
 router = APIRouter()
 
 @router.post('/login')
-def login(db = Depends(get_db) , form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(response: Response, db = Depends(get_db) , form_data: OAuth2PasswordRequestForm = Depends()):
     email = form_data.username
     password = form_data.password
-
-    Logger.log(LogLevel.DEBUG, f"email: {email}")
-    Logger.log(LogLevel.DEBUG, f"password: {password}")
-
-    creator = get_creator_by_email(db=db, email=email)
-
-    Logger.log(LogLevel.DEBUG, f"creator u: {creator.email}")
-
-    if not creator or not verify_password(password, creator.password_hash):
+    user = get_user_by_email(db=db, email=email)
+    if user is None or not verify_password(password, user.password_hash):
+        Logger.log(LogLevel.ERROR, "Incorrect login credentials.")
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=INVALID_LOGIN_CREDENTIALS_ERROR)
-
-    access_token = create_access_token(data={"sub": email})
-    refresh_token = create_refresh_token(data={"sub": email})
-
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    access_token = create_access_token(data={
+        "sub": str(user.id)
+    })
+    refresh_token = create_refresh_token(data={
+        "sub": str(user.id),
+        "jti": str(uuid4())
+    })
+    store_tokens(response, access_token, refresh_token)
+    if not user.has_profile:
+        return {
+            "id": user.id,
+            "username": user.username,
+            "has_profile": False,
+            "is_bank_connected": False
+        }
+    else:
+        return {
+            "id": user.id,
+            "username": user.username,
+            "has_profile": True,
+            "is_bank_connected": user.is_bank_connected
+        }
 
 @router.post('/refresh')
-def refresh_token(payload: TokenRefreshRequest):
-    token = payload.refresh_token
-    decoded = decode_refresh_token(token)
-
+async def refresh_auth_tokens(response: Response, refresh_token: str = Cookie(None)):
+    if refresh_token is None:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=INVALID_LOGIN_CREDENTIALS_ERROR)
+    decoded = decode_refresh_token(refresh_token)
     if decoded is None:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=INVALID_REFRESH_TOKEN_ERROR)
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=INVALID_LOGIN_CREDENTIALS_ERROR)
+    sub = decoded.get("sub")
+    access_token = create_access_token(data={
+        "sub": sub,
+    })
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,
+        samesite='lax',
+        max_age=60 * settings.access_token_expire_minutes
+    )
+    response.status_code = HTTP_204_NO_CONTENT
+    return response
 
-    email = decoded.get("sub")
-    if not email:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=INVALID_SUB_ERROR)
-
-    access_token = create_access_token(data={"sub": email})
-    refresh_token = create_refresh_token(data={"sub": email})
-
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=False,      
+        samesite="lax",
+        path="/"
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        path="/"
+    )
+    response.status_code = HTTP_204_NO_CONTENT
+    return response

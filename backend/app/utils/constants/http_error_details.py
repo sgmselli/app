@@ -1,10 +1,10 @@
 GENRE_NOT_FOUND_ERROR = 'Genre not found'
 CREATOR_PROFILE_NOT_FOUND_ERROR = 'Creator profile not found'
+CREATOR_PROFILE_ALREADY_EXISTS = "User profile already exists."
 CREATOR_NOT_FOUND_ERROR = 'Creator not found'
 INVALID_LOGIN_CREDENTIALS_ERROR="Invalid credentials"
 INVALID_REFRESH_TOKEN_ERROR="Invalid refresh token"
-INVALID_SUB_ERROR="Invalid token sub"
 EMAIL_USED_ERROR="Email already in use."
 USERNAME_USED_ERROR="Username already in use."
 TIP_NOT_FOUND_ERROR = "Tip not found."
-CREATOR_NOT_FOUND_ERROR = "Creator not found."
+BANK_ALREADY_CONNECTED_ERROR = "Bank already connected."
