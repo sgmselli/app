@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 import stripe
 
+from app.celery.tasks import task_send_payment_success_email
 from app.core import settings
-from app.crud.creator_profile import get_creator_profile_by_username
+from app.crud.creator_profile import get_creator_profile_by_username, get_creator_profile_by_id
 from app.external_services import stripe as stripe_functions 
 from app.crud.tip import create_tip
 from app.schemas.tip import TipCreate
@@ -78,8 +79,6 @@ async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session
             isPrivate=payload.isPrivate,
             connected_account_id=profile.stripe_account_id,
             display_name=profile.display_name,
-            return_url=settings.stripe_checkout_return_url,
-            refresh_url=settings.stripe_checkout_refresh_url,
             currency=profile.get_currency,
             payment_amount=payload.payment_amount,
             application_fee_percentage=settings.application_fee_percentage
@@ -109,22 +108,40 @@ async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
 
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-
         if db.query(Tip).filter_by(stripe_session_id=session["id"]).first():
             return {"status": "duplicate"}
 
+        customer = stripe.Customer.retrieve(session["customer"])
+        email = customer.get("email")
         isPrivate = session["metadata"].get("isPrivate", "false").lower() == "true"
+        creator_profile_id = int(session["metadata"].get("creator_profile_id"))
+        amount = int(session["amount_total"])
+        currency=session["currency"]
+        message = None
+        if session["metadata"].get("message"):
+            message = session["metadata"].get("message")
+        name = None
+        if session["metadata"].get("name"):
+            name = session["metadata"].get("name")
 
         tip_data = TipCreate(
-            creator_profile_id=int(session["metadata"].get("creator_profile_id")),
-            amount=int(session["amount_total"]),
-            name=session["metadata"].get("name"),
-            message=session["metadata"].get("message"),
+            creator_profile_id=creator_profile_id,
+            amount=amount,
+            name=name,
+            message=message,
             isPrivate=isPrivate,
             stripe_session_id=session["id"]
         )
-
         create_tip(db=db, tip_data=tip_data)
+
+        profile = get_creator_profile_by_id(db, creator_profile_id)
+
+        task_send_payment_success_email.delay(
+            to_email=email,
+            display_name=profile.display_name,
+            amount=str(amount/100),
+            currency=currency
+        )
 
     return {"status": "success"}
 
@@ -147,9 +164,6 @@ async def webhook_connect(request: Request, db: Session = Depends(get_db)):
         stripe_account_id = account["id"]
         charges_enabled = account["charges_enabled"]
         payouts_enabled = account["payouts_enabled"]
-
-        print(charges_enabled)
-        print(payouts_enabled)
 
         if charges_enabled:
             profile = (

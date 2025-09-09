@@ -13,6 +13,17 @@ from app.utils.constants.http_codes import (
     HTTP_500_INTERNAL_SERVER_ERROR
 )
 
+def get_creator_profile_by_id(db: Session, creator_profile_id: int):
+    user_profile = (
+        db.query(CreatorProfile)
+        .filter_by(id=creator_profile_id)
+        .first()
+    )
+    if not user_profile:
+        Logger.log(LogLevel.ERROR, f"Could not find the creator profile with id {creator_profile_id} on get request.")
+        return None
+    return user_profile
+
 def get_creator_profile_by_username(db: Session, username: str):
     user_profile = (
         db.query(CreatorProfile)

@@ -11,6 +11,7 @@ def create_tip(db: Session, tip_data: TipCreate) -> Tip:
         creator_profile_id=tip_data.creator_profile_id,
         amount=tip_data.amount,
         message=tip_data.message,
+        name=tip_data.name,
         isPrivate=tip_data.isPrivate,
         stripe_session_id=tip_data.stripe_session_id
     )
