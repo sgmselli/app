@@ -13,7 +13,14 @@ class Creator(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
-    auth_provider = Column(Enum(AuthProvider, native_enum= False), default=AuthProvider.PASSWORD, nullable=False)
     password_hash = Column(String, nullable=True)
+    profile = relationship("CreatorProfile", back_populates="creator", uselist=False, cascade="all, delete", passive_deletes=True)
 
-    profile = relationship("CreatorProfile", back_populates="creator", uselist=False)
+    @property
+    def has_profile(self) -> bool:
+        return self.profile is not None
+
+    @property
+    def is_bank_connected(self) -> bool:
+        """Return True if the user has a profile and Stripe is connected."""
+        return self.profile.is_bank_connected if self.has_profile else False

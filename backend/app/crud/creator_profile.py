@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
+from typing import Optional
 
-from app.models.creator_profile import CreatorProfile
 from app.models.creator import Creator
+from app.models.creator_profile import CreatorProfile
 from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate
 from app.utils.constants.http_error_details import CREATOR_PROFILE_NOT_FOUND_ERROR
 from app.utils.logging import LogLevel, Logger
@@ -12,50 +13,38 @@ from app.utils.constants.http_codes import (
     HTTP_500_INTERNAL_SERVER_ERROR
 )
 
-def get_creator_profile(db: Session, username: str):
-    creator = db.query(Creator).options(joinedload(Creator.profile)).filter(Creator.username == username).first()
-
-    if not creator or not creator.profile:
+def get_creator_profile_by_username(db: Session, username: str):
+    user_profile = (
+        db.query(CreatorProfile)
+        .join(Creator)
+        .options(joinedload(CreatorProfile.creator))
+        .filter(Creator.username == username)
+        .first()
+    )
+    if not user_profile:
         Logger.log(LogLevel.ERROR, f"Could not find the creator profile with username {username} on get request.")
-        raise ValueError(CREATOR_PROFILE_NOT_FOUND_ERROR)
+        return None
+    return user_profile
 
-    return creator.profile
-    
-
-def create_creator_profile(db: Session, creator_id: int, creator_profile_in: CreatorProfileCreate): 
+def create_user_profile(db: Session, user_id: int, creator_profile_in: CreatorProfileCreate):
     creator_profile = CreatorProfile(
-        creator_id = creator_id,
+        creator_id = user_id,
         display_name = creator_profile_in.display_name,
         bio = creator_profile_in.bio,
-        image_url = creator_profile_in.image_url,
-        stripe_account_id = creator_profile_in.stripe_account_id
+        youtube_channel_name = creator_profile_in.youtube_channel_name,
+        profile_picture_key = creator_profile_in.profile_picture_key,
+        profile_banner_key= creator_profile_in.profile_banner_key,
     )
-
     db.add(creator_profile)
-    try:
-        db.commit()
-
-    except IntegrityError as e:
-        db.rollback()
-        # Check for FK violaton or unique username violation by inspecting e.orig or e.args
-        error_message = str(e.orig).lower()
-        if "foreign key constraint" in error_message:
-            raise HTTPException(
-                status_code=HTTP_400_BAD_REQUEST,
-                detail=f"Creator with id {creator_id} does not exist."
-            )
-        elif "unique constraint" in error_message or "duplicate key" in error_message:
-            raise HTTPException(
-                status_code=HTTP_400_BAD_REQUEST,
-                detail="User already exists."
-            )
-        else:
-            raise HTTPException(
-                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database integrity error."
-            )
-         
-    db.refresh(creator_profile)
+    db.flush()
     return creator_profile
 
+def update_creator_profile(db: Session, creator_profile: CreatorProfile, update_in: CreatorProfileUpdate):
+
+    for field, value in update_in.dict(exclude_unset=True).items():
+        setattr(creator_profile, field, value)
+
+    db.add(creator_profile)
+    db.flush()
+    return creator_profile
 

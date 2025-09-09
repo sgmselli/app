@@ -3,69 +3,98 @@ from sqlalchemy.orm import Session
 import stripe
 
 from app.core import settings
+from app.crud.creator_profile import get_creator_profile_by_username
 from app.external_services import stripe as stripe_functions 
 from app.crud.tip import create_tip
 from app.schemas.tip import TipCreate
-from app.schemas.stripe import StripeCreateAccountLink, StripeCheckoutLink
-from app.utils.auth import get_current_user
+from app.schemas.stripe import BankConnectPayload, StripeCheckoutPayload
+from app.utils.auth import get_current_user, get_current_user_with_profile
 from app.db.session import get_db
-from app.db.base import Creator, Tip
-from app.crud.creator_profile import get_creator_profile
+from app.db.base import Creator, CreatorProfile, Tip
 from app.utils.constants.http_codes import (
-    HTTP_400_BAD_REQUEST
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND
 )
+from app.utils.constants.http_error_details import (
+    BANK_ALREADY_CONNECTED_ERROR,
+    CREATOR_PROFILE_NOT_FOUND_ERROR
+)
+from app.utils.logging import Logger, LogLevel
 
 stripe.api_key = settings.stripe_secret_key
 
 router = APIRouter()
 
-
 @router.post("/connect")
-async def create_stripe_account_link(payload: StripeCreateAccountLink, user: Creator = Depends(get_current_user), db: Session = Depends(get_db)):
-    country_details = stripe_functions.get_stripe_country_details(country=payload.country)
-    country_code = country_details.country_code
-
-    account_id = stripe_functions.create_stripe_account(email=user.email, country_code=country_code)
-    account_link = stripe_functions.create_stripe_account_link(connected_account_id=account_id, return_url=settings.stripe_return_url, refresh_url=settings.stripe_refresh_url)
-
-    profile = user.profile
+def connect_bank_account(
+    payload: BankConnectPayload,
+    db: Session = Depends(get_db),
+    current_user: Creator = Depends(get_current_user),
+):
+    profile = current_user.profile
+    if not profile:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail=CREATOR_PROFILE_NOT_FOUND_ERROR
+        )
+    if profile.is_bank_connected:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail=BANK_ALREADY_CONNECTED_ERROR
+        )
+    try:
+        country_code = stripe_functions.get_stripe_country_details(
+            country=payload.country
+        ).country_code
+    except ValueError as e:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
+    account_id = stripe_functions.create_stripe_account(
+        email=current_user.email,
+        country_code=country_code,
+        youtube_url=f"https://www.youtube.com/@{profile.youtube_channel_name}",
+    )
+    account_link = stripe_functions.create_stripe_account_link(
+        connected_account_id=account_id,
+        return_url=settings.stripe_return_url,
+        refresh_url=settings.stripe_refresh_url,
+    )
     profile.stripe_account_id = account_id
-    profile.country = payload.country 
-    db.add(profile)
+    profile.country = payload.country
     db.commit()
-    
+    db.refresh(profile)
     return {"url": account_link}
 
 @router.post("/checkout")
-async def create_stripe_account_link(payload: StripeCheckoutLink, db: Session = Depends(get_db)):
+async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session = Depends(get_db)):
     try:
-        profile = get_creator_profile(username=payload.username, db=db)
-        country_details = stripe_functions.get_stripe_country_details(country=profile.country)
-        currency = country_details.currency
+        username = payload.username
+        profile = get_creator_profile_by_username(username=username, db=db)
 
         session_url = stripe_functions.create_stripe_checkout_session_link(
             creator_profile_id=profile.id,
+            username=username,
+            name=payload.name,
             message=payload.message,
-            private=payload.private,
+            isPrivate=payload.isPrivate,
             connected_account_id=profile.stripe_account_id,
             display_name=profile.display_name,
             return_url=settings.stripe_checkout_return_url,
             refresh_url=settings.stripe_checkout_refresh_url,
-            currency=currency,
+            currency=profile.get_currency,
             payment_amount=payload.payment_amount,
             application_fee_percentage=settings.application_fee_percentage
         )
-
         return {"url": session_url}
 
     except ValueError as e:
+        Logger.log(LogLevel.ERROR, str(e))
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
     
-@router.post('/webhook')
-async def webhook(request: Request, db: Session = Depends(get_db)):
+@router.post('/webhook/checkout')
+async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig_header = request.headers.get("Stripe-Signature")
 
@@ -81,19 +110,55 @@ async def webhook(request: Request, db: Session = Depends(get_db)):
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
 
-        if db.query(Tip).filter(Tip.stripe_session_id == session["id"]).first():
+        if db.query(Tip).filter_by(stripe_session_id=session["id"]).first():
             return {"status": "duplicate"}
 
-        private = session["metadata"].get("private", "false").lower() == "true"
+        isPrivate = session["metadata"].get("isPrivate", "false").lower() == "true"
 
         tip_data = TipCreate(
             creator_profile_id=int(session["metadata"].get("creator_profile_id")),
             amount=int(session["amount_total"]),
+            name=session["metadata"].get("name"),
             message=session["metadata"].get("message"),
-            private=private,
+            isPrivate=isPrivate,
             stripe_session_id=session["id"]
         )
 
         create_tip(db=db, tip_data=tip_data)
+
+    return {"status": "success"}
+
+@router.post("/webhook/connect")
+async def webhook_connect(request: Request, db: Session = Depends(get_db)):
+    payload = await request.body()
+    sig_header = request.headers.get("Stripe-Signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.stripe_webhook_secret
+        )
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+
+    if event["type"] == "account.updated":
+        account = event["data"]["object"]
+        stripe_account_id = account["id"]
+        charges_enabled = account["charges_enabled"]
+        payouts_enabled = account["payouts_enabled"]
+
+        print(charges_enabled)
+        print(payouts_enabled)
+
+        if charges_enabled:
+            profile = (
+                db.query(CreatorProfile)
+                .filter_by(stripe_account_id=stripe_account_id)
+                .first()
+            )
+            if profile:
+                profile.is_bank_connected = True
+                db.commit()
 
     return {"status": "success"}
