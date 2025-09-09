@@ -20,14 +20,11 @@ def create_tip(db: Session, tip_data: TipCreate) -> Tip:
     db.refresh(tip)
     return tip
 
-def get_tips_by_creator(db: Session, creator_id: int, include_private: bool = False, limit: int = 10, offset: int = 0):
-    query = db.query(Tip).filter(Tip.creator_profile_id == creator_id)
+def get_tips_by_creator(db: Session, creator_profile_id: int, include_private: bool = False, limit: int = 8, offset: int = 0):
+    query = db.query(Tip).filter_by(creator_profile_id=creator_profile_id)
     if not include_private:
         query = query.filter(Tip.isPrivate == False)
-    
     tips = query.order_by(Tip.created_at.desc()).limit(limit).offset(offset).all()
-
     if not tips:
-        Logger.log(LogLevel.ERROR, f"No tips found for creator with id {creator_id}.")
-
+        Logger.log(LogLevel.ERROR, f"No tips found for creator profile with id {creator_profile_id}.")
     return tips

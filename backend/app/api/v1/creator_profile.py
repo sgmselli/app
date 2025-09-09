@@ -12,7 +12,7 @@ from app.utils.constants.http_codes import (
     HTTP_500_INTERNAL_SERVER_ERROR
 )
 from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate, CreatorProfileOut
-from app.db.base import Creator
+from app.db.base import Creator, Tip
 from app.db.session import get_db
 from app.crud import creator_profile as crud_creator_profile
 from app.utils.auth import get_current_user, get_optional_user, get_current_user_with_profile
@@ -33,9 +33,7 @@ async def get(username: str, db: Session = Depends(get_db), current_user: Option
         )
         if not creator_profile:
             raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=CREATOR_PROFILE_NOT_FOUND_ERROR)
-        tips = creator_profile.tips
-        if not current_user or current_user.username != username:
-            tips = [tip for tip in tips if not tip.isPrivate]
+        tips = db.query(Tip).filter_by(creator_profile_id=creator_profile.id).order_by(Tip.created_at.desc()).limit(6).all()
         profile_picture_url=None
         if creator_profile.profile_picture_key:
             profile_picture_url=build_s3_url(creator_profile.profile_picture_key)

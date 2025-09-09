@@ -1,14 +1,16 @@
 import React from 'react'
 
+import type { Tip } from '../../../types/tip';
+
 interface TipsProps {
-    tips: TipProps[];
+    tips: Tip[];
 }
 
 export interface TipProps {
     id: number;
-    amount: string;
-    name: string | null;
-    message: string | null;
+    amount: number;
+    name?: string | null;
+    message?: string | null;
     isPrivate: boolean
     created_at: Date;
 }

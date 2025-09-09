@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom"
 import Logo from "./Logo";
 import { useAuth } from "../contexts/AuthContext";
 
-import profile from '../assets/images/youtube_profile.jpg'
-
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const { logoutUser } = useAuth();
