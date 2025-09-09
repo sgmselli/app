@@ -114,7 +114,7 @@ def calculate_application_fee(amount: int, percent_fee: float) -> int:
     fee = int(amount * (percent_fee / 100))
     return fee
 
-def create_stripe_checkout_session_link(creator_profile_id: int, username: str, message: str, name: str, isPrivate:bool, connected_account_id: str, display_name:str, return_url: str, refresh_url: str, currency:str, payment_amount: float, application_fee_percentage: float):
+def create_stripe_checkout_session_link(creator_profile_id: int, username: str, isPrivate:bool, connected_account_id: str, display_name:str, currency:str, payment_amount: float, application_fee_percentage: float,  message: Optional[str] = None, name: Optional[str] = None):
     application_fee_amount = calculate_application_fee(payment_amount, application_fee_percentage)
     success_url = f"{settings.frontend_url}/{username}?result=success?amount={payment_amount}"
     cancel_url = f"{settings.frontend_url}/{username}?result=cancel?amount={payment_amount}"
@@ -136,6 +136,7 @@ def create_stripe_checkout_session_link(creator_profile_id: int, username: str, 
         mode="payment",
         success_url=success_url,
         cancel_url=cancel_url,
+        customer_creation="always",
         payment_intent_data={
             "transfer_data": {
                 "destination": connected_account_id,
@@ -144,8 +145,8 @@ def create_stripe_checkout_session_link(creator_profile_id: int, username: str, 
         },
         metadata={
             "creator_profile_id": str(creator_profile_id), 
-            "message": str(message),
-            "name": str(name),
+            "message": message,
+            "name": name,
             "isPrivate": str(isPrivate)
         },
     )

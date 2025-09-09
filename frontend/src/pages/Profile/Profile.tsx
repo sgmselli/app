@@ -47,6 +47,7 @@ const Profile: React.FC = () => {
                     setProfilePictureUrl(profile.profile_picture_url)
                     setProfileBannerUrl(profile.profile_banner_url)
                     setBankConnected(profile.is_bank_connected)
+                    console.log(profile.tips)
                 } catch (err: any) {
                     console.log(err)
                     setError(err.response?.data?.error || "TubeTip profile does not exist");

@@ -37,5 +37,7 @@ class BaseAppSettings(BaseSettings):
     redis_password: str | None = None
     bucket_name: str | None = None
     aws_region: str | None = None
+    send_grid_api_key: Optional[str] = None
+    from_email: Optional[str] = None
 
 

@@ -38,5 +38,21 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=db
 
+  celery_worker:
+    build: ./backend
+    command: celery -A app.celery_app worker --loglevel=info
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
 volumes:
   db_data:

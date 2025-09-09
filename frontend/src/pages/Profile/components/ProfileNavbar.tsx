@@ -21,7 +21,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
   loginUser,
 }) => {
   return (
-    <nav className="w-full h-[150px] flex items-center justify-between px-14" >
+    <nav className="w-full h-[100px] flex items-center justify-between px-14 pt-10" >
       <div className="flex flex-row gap-6 items-center">
         {
           profilePictureUrl ?
