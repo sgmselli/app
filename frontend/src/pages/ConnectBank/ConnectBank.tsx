@@ -5,6 +5,7 @@ import type { ConnectBankRequest, ConnectBankResponse } from "../../types/paymen
 import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import Steps from "../../components/Steps";
 
 const ConnectBank: React.FC = () => {
   const [country, setCountry] = useState<keyof typeof Country>("UnitedKingdom");
@@ -196,6 +197,8 @@ const ConnectBank: React.FC = () => {
           )}
         </form>
       </div>
+      <Steps steps={4} currentStep={3} />
+
     </div>
   );
 };

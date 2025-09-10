@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCreatorProfile } from '../../api/profile';
 import Navbar from '../../components/Navbar';
+import Steps from '../../components/Steps';
 
 const ProfileSetUp: React.FC = () => {
     const [displayName, setDisplayName] = useState<string>("");
@@ -16,7 +17,7 @@ const ProfileSetUp: React.FC = () => {
     const navigate = useNavigate();
 
     const buildRequestData = () => {
-        return {display_name: displayName, bio: bio, profile_picture: profilePicture, profile_banner: profileBanner, youtube_channel_name: youtubeChannelName}
+        return {display_name: displayName, bio: bio, youtube_channel_name: youtubeChannelName}
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +26,7 @@ const ProfileSetUp: React.FC = () => {
         setLoading(true);
         try {
             await createCreatorProfile(buildRequestData());
-            navigate("/bank/connect");
+            navigate("/profile/setup/pictures");
         } catch (err: any) {
             setError(err.response?.data?.error || "There was an error setting up your profile");
         } finally {
@@ -37,7 +38,7 @@ const ProfileSetUp: React.FC = () => {
 <div className="flex flex-col min-h-screen w-full">
   <Navbar />
 
-  <div className="flex flex-1 items-start justify-center w-full">
+  <div className="flex flex-1 items-start justify-center w-full pb-5">
     <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto pb-8">
       <h2 className="text-4xl font-medium mb-4 text-center">Complete your page</h2>
       <h4 className="text-lg font-normal mb-10 text-center text-gray-500">
@@ -45,59 +46,6 @@ const ProfileSetUp: React.FC = () => {
       </h4>
 
       {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-
-      <div className="flex flex-col items-center justify-center form-control mb-8">
-
-        <label
-          htmlFor="profilePicture"
-          className="w-35 h-35 rounded-xl overflow-hidden bg-base-200 flex items-center justify-center 
-            border border-gray-300 mb-2 cursor-pointer hover:opacity-80 transition"
-        >
-          {profilePicture ? (
-            <img
-              src={URL.createObjectURL(profilePicture)}
-              alt="Profile preview"
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <span className="text-gray-400 font-semibold text-sm text-center">Upload profile picture</span>
-          )}
-        </label>
-        <input
-          id="profilePicture"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
-          className="hidden"
-        />
-      </div>
-
-      {/* Profile Banner Upload */}
-      <div className="flex flex-col justify-center form-control mb-8">
-
-        <label
-          htmlFor="profileBanner"
-          className="w-full h-[150px] rounded-xl overflow-hidden bg-base-200 flex items-center justify-center 
-            border border-gray-300 mb-2 cursor-pointer hover:opacity-80 transition"
-        >
-          {profileBanner ? (
-            <img
-              src={URL.createObjectURL(profileBanner)}
-              alt="Banner preview"
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <span className="text-gray-400 font-semibold text-sm">Upload profile banner</span>
-          )}
-        </label>
-        <input
-          id="profileBanner"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setProfileBanner(e.target.files?.[0] || null)}
-          className="hidden"
-        />
-      </div>
 
       {/* Channel Name */}
       <div className="form-control mb-8">
@@ -138,7 +86,7 @@ const ProfileSetUp: React.FC = () => {
             onChange={(e) => setYoutubeChannelName(e.target.value)}
           />
         </label>
-        <p className="mt-2 text-xs text-gray-500 leading-snug break-words">
+        <p className="mt-2 text-sm text-gray-500 leading-snug break-words">
           E.g. <span className="font-medium">www.youtube.com/@TubeTip</span> has
           channel name <span className="font-medium">TubeTip</span>.
         </p>
@@ -173,8 +121,11 @@ const ProfileSetUp: React.FC = () => {
       </button>
     </form>
   </div>
+
+  <Steps steps={4} currentStep={1} />
+
 </div>
     )
 }
 
-export default ProfileSetUp
+export default ProfileSetUp;

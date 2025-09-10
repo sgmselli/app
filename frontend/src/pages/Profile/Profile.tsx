@@ -139,9 +139,9 @@ const Profile: React.FC = () => {
                             <div className="flex flex-col shadow-lg rounded-xl bg-white p-6">
                                 <h2 className="text-xl font-medium">Recent tips</h2>
                                 {numberOfTips === 0 ? (
-                                <div className="p-6 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
+                                <div className="p-10 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
                                     <p className="text-gray-700 text-center text-sm">
-                                    Be the first one to tip {displayName}.
+                                        <span className="font-semibold">It's a bit quiet here...</span> be the first one to tip {displayName}.
                                     </p>
                                 </div>
                                 ) : (

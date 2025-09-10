@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Navbar from "../../components/Navbar";
+import Steps from "../../components/Steps";
 
 const ConnectBankSuccess: React.FC = () => {
 
@@ -30,6 +31,7 @@ const ConnectBankSuccess: React.FC = () => {
             </button>
           </div>
         </div>
+        <Steps steps={4} currentStep={4} />
       </div>
     );
 };

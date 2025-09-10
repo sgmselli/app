@@ -173,13 +173,13 @@ def update_profile(
         updated_profile = crud_creator_profile.update_creator_profile(db, profile, update_in)
         db.commit()
 
-        if new_picture_key:
+        if new_picture_key and old_picture_key:
             #Delete old profile picture
             delete_profile_picture_from_s3(
                 s3_client=s3_client,
                 key=old_picture_key,
             )
-        if new_banner_key:
+        if new_banner_key and old_picture_key:
             # Delete old profile banner
             delete_profile_banner_from_s3(
                 s3_client=s3_client,
