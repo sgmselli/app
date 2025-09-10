@@ -33,6 +33,7 @@ class CurrentUserDataOut(BaseModel):
     email: str
     has_profile: bool
     is_bank_connected: bool
+    profile_picture_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -45,6 +46,7 @@ class CreatorWithProfileOut(BaseModel):
     bio: Optional[str] = None
     stripe_account_id: Optional[str] = None
     is_bank_connected: bool
+    profile_picture_key: Optional[str] = None
 
     class Config:
         from_attributes = True

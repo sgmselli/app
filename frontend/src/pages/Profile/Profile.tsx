@@ -25,7 +25,6 @@ const Profile: React.FC = () => {
     const [numberOfTips, setNumberOfTips] = useState<number>(0)
     const [bankConnected, setBankConnected] = useState<boolean | null>(null)
 
-
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +49,6 @@ const Profile: React.FC = () => {
                     setBankConnected(profile.is_bank_connected)
                     setId(profile.id)
                 } catch (err: any) {
-                    console.log(err)
                     setError(err.response?.data?.error || "TubeTip profile does not exist");
                 } finally {
                     setLoading(false);
@@ -60,6 +58,21 @@ const Profile: React.FC = () => {
         handleFetch();
     }, [])
 
+    const handleSave = (formData: { displayName?: string; bio?: string, profilePictureUrl?: string, profileBannerUrl?: string }) => {
+        if (formData.displayName) {
+            setDisplayName(formData.displayName)
+        } 
+        if (formData.bio) {
+            setBio(formData.bio)
+        } 
+        if (formData.profilePictureUrl) {
+            setProfilePictureUrl(formData.profilePictureUrl)
+        } 
+        if (formData.profileBannerUrl) {
+            setProfileBannerUrl(formData.profileBannerUrl)
+        } 
+    };
+
     const handleLogout = async () => {
         await logoutUser();
         navigate('/login')
@@ -68,21 +81,26 @@ const Profile: React.FC = () => {
     const navigateLogin = () => {
         navigate("/login")
     }
-    
+
+    if (loading || loadingUser) {
+        return (
+            <div>
+                <h2>Loading...</h2>
+            </div>
+        )
+    }
+
+    const isLoggedInUser = user?.username === username
+
     return (
         <div className="flex flex-col min-h-screen w-full bg-white">
-            {(user?.username === username) && !bankConnected && (
+            {isLoggedInUser && !bankConnected && (
                 <ConnectBankBanner />
             )}
-            <ProfileNavbar bankConnected={bankConnected} profilePictureUrl={profilePictureUrl} displayName={displayName} numberOfTips={numberOfTips} isAuthenticated={isAuthenticated} loginUser={navigateLogin} logoutUser={handleLogout} />
+            <ProfileNavbar isLoggedInUser={isLoggedInUser} myProfilePicture={user?.profile_picture_url} onSave={handleSave} bankConnected={bankConnected} profilePictureUrl={profilePictureUrl} profileBannerUrl={profileBannerUrl} displayName={displayName} bio={bio} numberOfTips={numberOfTips} isAuthenticated={isAuthenticated} loginUser={navigateLogin} logoutUser={handleLogout} />
 
             {!error ? (
-                <>
-                {loading || loadingUser ? (
-                    <div>
-                    <h2>Loading...</h2>
-                    </div>
-                ) : (
+                
                     <div className="flex flex-col items-center w-full">
                     <div className="w-95% max-w-[1100px]"> 
                         
@@ -91,7 +109,7 @@ const Profile: React.FC = () => {
                             <img
                                 src={profileBannerUrl}
                                 alt="YouTube Banner"
-                                className="w-full h-[180px] object-cover rounded-xl shadow-md"
+                                className="w-full h-[180px] object-cover rounded-xl shadow-lg mt-5"
                             />
                             )
                         }
@@ -101,7 +119,7 @@ const Profile: React.FC = () => {
                         <div className="flex flex-col justify-start gap-6 w-[500px]">
 
                         {/* About Section */}
-                        <div className="flex flex-col shadow-md rounded-xl bg-white p-6">
+                        <div className="flex flex-col shadow-lg rounded-xl bg-white p-6">
                             <h2 className="text-lg font-medium mb-2">About {displayName}</h2>
 
                             <a
@@ -118,7 +136,7 @@ const Profile: React.FC = () => {
                         </div>
 
                             {/* Tips Section */}
-                            <div className="flex flex-col shadow-md rounded-xl bg-white p-6">
+                            <div className="flex flex-col shadow-lg rounded-xl bg-white p-6">
                                 <h2 className="text-xl font-medium">Recent tips</h2>
                                 {numberOfTips === 0 ? (
                                 <div className="p-6 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
@@ -127,22 +145,32 @@ const Profile: React.FC = () => {
                                     </p>
                                 </div>
                                 ) : (
-                                <Tips tips={tips} />
+                                    <>
+                                        <Tips tips={tips} />
+                                        {
+                                            numberOfTips > 8 && (
+                                                <>
+                                                    <button
+                                                        onClick={() => setIsModalOpen(true)}
+                                                        className="btn btn-lg btn-neutral hover:text-white btn-outline text-[16px] font-normal rounded-full mt-2 flex items-center gap-2"
+                                                    >
+                                                        See more tips
+                                                        <ChevronDown size={18} />
+                                                    </button>
+                                                    <TipsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} id={id} />
+                                                </>
+                                            )
+                                        }
+                                        
+                                    </>
                                 )}
-                                <button
-                                    onClick={() => setIsModalOpen(true)}
-                                    className="btn btn-lg btn-neutral hover:text-white btn-outline text-[16px] font-normal rounded-full mt-2 flex items-center gap-2"
-                                >
-                                    See more tips
-                                    <ChevronDown size={18} />
-                                </button>
-                                <TipsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} id={id} />
+                                
                             </div>
 
                         </div>
 
                         {/* Donate Section */}
-                        <div className="p-10 rounded-xl bg-white shadow-md">
+                        <div className="p-10 rounded-xl bg-white shadow-lg">
                             <Donate
                                 displayName={displayName || ""}
                                 username={username || ""}
@@ -155,12 +183,10 @@ const Profile: React.FC = () => {
                 </div>
             <ProfileFooter />
         </div>
-      )}
-    </>
-  ) : (
-    <h2>{error}</h2>
-  )}
-</div>
+        ) : (
+            <h2>{error}</h2>
+        )}
+    </div>
     );
 }
 

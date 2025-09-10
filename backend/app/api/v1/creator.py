@@ -13,6 +13,7 @@ from app.utils.constants.http_codes import (
     HTTP_404_NOT_FOUND
 )
 from app.utils.logging import Logger, LogLevel
+from app.utils.s3 import build_s3_url
 
 router = APIRouter()
 
@@ -24,7 +25,8 @@ async def get_logged_in_user(current_user: CreatorWithProfileOut = Depends(get_c
             "username": current_user.username,
             "email": current_user.email,
             "has_profile": current_user.has_profile,
-            "is_bank_connected": current_user.is_bank_connected
+            "is_bank_connected": current_user.is_bank_connected,
+            "profile_picture_url": current_user.profile_picture_url
         }
     except ValueError as e:
         raise HTTPException(

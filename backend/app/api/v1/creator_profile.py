@@ -1,3 +1,5 @@
+from fileinput import filename
+
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from fastapi.exceptions import HTTPException 
 from sqlalchemy.orm import Session
@@ -18,9 +20,12 @@ from app.crud import creator_profile as crud_creator_profile
 from app.utils.auth import get_current_user, get_optional_user, get_current_user_with_profile
 from app.utils.constants.http_error_details import (
     CREATOR_PROFILE_NOT_FOUND_ERROR,
-    CREATOR_PROFILE_ALREADY_EXISTS
+    CREATOR_PROFILE_ALREADY_EXISTS,
+    CREATOR_PROFILE_DOES_NOT_EXIST
 )
-from app.utils.s3 import build_s3_url
+from app.utils.logging import Logger, LogLevel
+from app.utils.s3 import build_s3_url, upload_profile_picture_to_s3, delete_profile_picture_from_s3, \
+    upload_profile_banner_to_s3, delete_profile_banner_from_s3
 
 router = APIRouter()
 
@@ -115,6 +120,94 @@ async def create(
         )
 
     except Exception as e:
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.patch("/update")
+def update_profile(
+    display_name: str = Form(None),
+    bio: str = Form(None),
+    profile_picture: UploadFile = File(None),
+    profile_banner: UploadFile = File(None),
+    current_user: Creator = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not current_user.has_profile:
+        raise HTTPException(status_code=400, detail=CREATOR_PROFILE_DOES_NOT_EXIST)
+
+    profile = current_user.profile
+    old_picture_key = profile.profile_picture_key
+    old_banner_key = profile.profile_banner_key
+    new_picture_key = None
+    new_banner_key = None
+    s3_client = AwsS3Client()
+    args = {}
+
+    try:
+        if display_name is not None:
+            args["display_name"] = display_name
+        if bio is not None:
+            args["bio"] = bio
+        if profile_picture:
+            #Upload new profile picture
+            new_picture_key = upload_profile_picture_to_s3(
+                s3_client=s3_client,
+                user_id=current_user.id,
+                filename=profile_picture.filename,
+                file=profile_picture.file
+            )
+            args["profile_picture_key"] = new_picture_key
+        if profile_banner:
+            # Upload new profile banner
+            new_banner_key = upload_profile_banner_to_s3(
+                s3_client=s3_client,
+                user_id=current_user.id,
+                filename=profile_banner.filename,
+                file=profile_banner.file
+            )
+            args["profile_banner_key"] = new_banner_key
+
+        update_in = CreatorProfileUpdate(**args)
+        updated_profile = crud_creator_profile.update_creator_profile(db, profile, update_in)
+        db.commit()
+
+        if new_picture_key:
+            #Delete old profile picture
+            delete_profile_picture_from_s3(
+                s3_client=s3_client,
+                key=old_picture_key,
+            )
+        if new_banner_key:
+            # Delete old profile banner
+            delete_profile_banner_from_s3(
+                s3_client=s3_client,
+                key=old_banner_key,
+            )
+
+        profile_picture_url = None
+        profile_banner_url = None
+        if updated_profile.profile_picture_key:
+            profile_picture_url=build_s3_url(updated_profile.profile_picture_key)
+        if updated_profile.profile_banner_key:
+            profile_banner_url = build_s3_url(updated_profile.profile_banner_key)
+
+        return CreatorProfileOut(
+            id=updated_profile.id,
+            display_name=updated_profile.display_name,
+            bio=updated_profile.bio,
+            profile_picture_url=profile_picture_url,
+            profile_banner_url=profile_banner_url,
+        )
+
+    except Exception as e:
+        if new_picture_key:
+            delete_profile_picture_from_s3(s3_client, new_picture_key)
+        if new_banner_key:
+            delete_profile_banner_from_s3(s3_client, new_banner_key)
+        db.rollback()
+        Logger.log(LogLevel.ERROR, str(e))
         raise HTTPException(
             status_code=HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

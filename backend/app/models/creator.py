@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import Column, Enum, Integer, String
 from sqlalchemy.orm import relationship
 import enum
@@ -24,3 +26,8 @@ class Creator(Base):
     def is_bank_connected(self) -> bool:
         """Return True if the user has a profile and Stripe is connected."""
         return self.profile.is_bank_connected if self.has_profile else False
+
+    @property
+    def profile_picture_url(self) -> Optional[str]:
+        """Return True if the user has a profile and Stripe is connected."""
+        return self.profile.profile_picture_url if self.has_profile else None
