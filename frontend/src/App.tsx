@@ -13,7 +13,7 @@ import Register from "./pages/Auth/Register";
 import ConnectBank from "./pages/ConnectBank/ConnectBank";
 import ConnectBankSuccess from "./pages/ConnectBank/ConnectBankSuccess";
 import ProfileSetUp from "./pages/ProfileSetUp/ProfileSetUp";
-import SetUpConfirmation from "./pages/ProfileSetUp/SetUpConfirmation";
+import ProfilePictureSetUp from "./pages/ProfileSetUp/ProfileImageSetUp";
 import Profile from "./pages/Profile/Profile";
 import CheckoutSuccess from "./pages/Checkout/CheckoutSuccess";
 import CheckoutFailure from "./pages/Checkout/CheckoutFailure";
@@ -38,6 +38,7 @@ export default function App() {
                 <Route element={<ProfileSetupRoute />}>
                   <Route path="/profile/setup" element={<ProfileSetUp />} />
                 </Route>
+                <Route path="/profile/setup/pictures" element={<ProfilePictureSetUp />} />
                 <Route element={<ConnectBankRoute />}>
                   <Route path="/bank/connect" element={<ConnectBank />} />
                 </Route>
