@@ -52,7 +52,7 @@ def create_user_profile(db: Session, user_id: int, creator_profile_in: CreatorPr
 
 def update_creator_profile(db: Session, creator_profile: CreatorProfile, update_in: CreatorProfileUpdate):
 
-    for field, value in update_in.dict(exclude_unset=True).items():
+    for field, value in update_in.model_dump(exclude_unset=True).items():
         setattr(creator_profile, field, value)
 
     db.add(creator_profile)
