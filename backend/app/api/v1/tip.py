@@ -29,6 +29,5 @@ async def get_creator_and_tips(creator_profile_id: int, limit: int = Query(10, g
         creator_profile_id=creator_profile_id,
         limit=limit,
         offset=offset,
-        include_private=True,
     )
     return {"tips": tips}

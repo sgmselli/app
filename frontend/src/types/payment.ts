@@ -13,7 +13,6 @@ export interface CheckoutBankRequest {
   payment_amount: number
   name: string | null
   message: string | null
-  isPrivate: boolean
 }
 
 export interface CheckoutBankResponse {

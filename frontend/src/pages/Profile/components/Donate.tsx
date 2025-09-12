@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 import { getCheckoutUrl } from '../../../api/payment';
-import Tips from './Tips';
 import Logo from '../../../components/Logo';
+import Input from '../../../components/elements/input';
+import Textarea from '../../../components/elements/textarea';
 
 interface Props {
     username: string;
@@ -16,27 +17,29 @@ const Donate: React.FC<Props> = (props: Props) => {
     const [tipAmount, setTipAmount] = useState<number>(1);
     const [name, setName] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
-    const [isPrivate, setIsPrivate] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
+        setErrors({});
         setLoading(true);
         try {
             const response = await getCheckoutUrl({
                 username: props.username, 
                 payment_amount: calculateTotalTip(tipAmount),
                 name: name,
-                message: message,
-                isPrivate: isPrivate
+                message: message
             });
             window.location.href = response.url;
 
         } catch (err: any) {
-            console.log(err);
-            setError("Failed to checkout Please try again.");
+            const apiErrors = err?.response?.data?.errors || [];
+            const newErrors: Record<string, string> = {};
+            apiErrors.forEach((e: { field: string; message: string }) => {
+                newErrors[e.field] = e.message;
+            });
+            setErrors(newErrors);
         } finally {
             setLoading(false);
         }
@@ -53,10 +56,8 @@ const Donate: React.FC<Props> = (props: Props) => {
     return (
         <div className="max-w-xl">
             <form onSubmit={handleSubmit} className='w-full'>
-                {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
                 <h2 className="text-2xl text-gray-700 font-semibold mb-2">Give <span >{props.displayName}</span> a TubeTip</h2>
                 <h4 className="text-lg font-normal text-gray-500">{props.bankConnected ? "A TubeTip is a friendly way of giving support to your hard working content creator." : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
-
 
                 {
                     props.bankConnected && (
@@ -65,44 +66,31 @@ const Donate: React.FC<Props> = (props: Props) => {
                 }
                 
                 <div className="form-control mt-5">
-                    <input
+                    <Input
                         id="name"
-                        value={name ? name : ""} 
-                        onChange={e => setName(e.target.value)}
+                        value={name} 
+                        onChange={setName}
                         type="text"
-                        placeholder="Your name"
-                        className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium focus:outline-none focus:border-2 focus:bg-white cursor-pointer hover:bg-base-300 focus:border-red-300"
+                        placeholder="Your name (optional)"
                         disabled={!props.bankConnected}
+                        error={errors.name}
                     />
                 </div>
 
                 <div className="form-control mt-5">
-                    <textarea
+                    <Textarea
                         id="message"
-                        value={message ? message : ""} 
-                        placeholder="Write a nice message with your TubeTip"
-                        onChange={e => setMessage(e.target.value)}
-                        className="textarea textarea-lg w-full bg-base-200 rounded-lg min-h-[100px] resize-none !text-[14px] cursor-pointer hover:bg-base-300 focus:border-red-300 font-medium focus:border-2 focus:outline-none focus:bg-white"
+                        value={message} 
+                        placeholder="Write a nice message with your TubeTip (optional)"
+                        onChange={setMessage}
                         disabled={!props.bankConnected}
+                        error={errors.message}
                     />
                 </div>
-                <div className="form-control mt-4">
-                    <label className="cursor-pointer label flex items-center gap-2">
-                        <input
-                        type="checkbox"
-                        className="checkbox checkbox-xs"
-                        checked={isPrivate}
-                        onChange={() => setIsPrivate(!isPrivate)}
-                        disabled={!props.bankConnected}
-                        />
-                        <span className="label-text text-sm">Make message private</span>
-                    </label>
-                </div>
-                
                 <button
                     type='submit'
                     disabled={!props.bankConnected || loading}
-                    className="btn primary-btn btn-xl text-[16px] border-0 rounded-lg w-[100%] mt-5"
+                    className="btn primary-btn btn-xl text-[16px] font-normal border-0 rounded-lg w-[100%] mt-5"
                 >
                     {loading ?  <span className="loading loading-spinner"></span> : props.bankConnected ? `Tip ${props.currency}${(tipAmount*3).toString()}` : "Unavailable"}
                 </button>
@@ -137,7 +125,6 @@ const DonateAmount: React.FC<DonateAmountProps> = (props: DonateAmountProps) => 
         <DonateNumberButton tips={2} tipAmount={props.tipAmount} setAmount={props.setAmount} />
         <DonateNumberButton tips={3} tipAmount={props.tipAmount} setAmount={props.setAmount} />
         <DonateNumberButton tips={4} tipAmount={props.tipAmount} setAmount={props.setAmount} />
-        {/* <DonateNumberButton tips={5} tipAmount={props.tipAmount} setAmount={props.setAmount} /> */}
 
         <input
         type="text"

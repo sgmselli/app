@@ -2,8 +2,6 @@ export interface CreateProfileRequest {
   display_name: string;
   bio: string;
   youtube_channel_name: string;
-  profile_picture?: File | null
-  profile_banner?: File | null
 }
 
 export interface CreateProfileResponse {
@@ -76,4 +74,14 @@ export interface UpdateProfileResponse {
   youtube_channel_name: string;
   profile_picture_url: string
   profile_banner_url: string
+}
+
+export interface UploadProfileImagesResponse {
+  profile_picture_url?: string | null
+  profile_banner_url?: string | null
+}
+
+export interface UploadProfileImagesRequest {
+  profile_picture?: File | null
+  profile_banner?: File | null
 }

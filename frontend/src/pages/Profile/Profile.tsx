@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
             }
         }
         handleFetch();
-    }, [])
+    }, [username])
 
     const handleSave = (formData: { displayName?: string; bio?: string, profilePictureUrl?: string, profileBannerUrl?: string }) => {
         if (formData.displayName) {
@@ -82,6 +82,10 @@ const Profile: React.FC = () => {
         navigate("/login")
     }
 
+    const navigateMyProfile = () => {
+        navigate(`/${user?.username}`)
+    }
+
     if (loading || loadingUser) {
         return (
             <div>
@@ -97,7 +101,22 @@ const Profile: React.FC = () => {
             {isLoggedInUser && !bankConnected && (
                 <ConnectBankBanner />
             )}
-            <ProfileNavbar isLoggedInUser={isLoggedInUser} myProfilePicture={user?.profile_picture_url} onSave={handleSave} bankConnected={bankConnected} profilePictureUrl={profilePictureUrl} profileBannerUrl={profileBannerUrl} displayName={displayName} bio={bio} numberOfTips={numberOfTips} isAuthenticated={isAuthenticated} loginUser={navigateLogin} logoutUser={handleLogout} />
+            <ProfileNavbar 
+                username={username} 
+                isLoggedInUser={isLoggedInUser} 
+                onSave={handleSave} 
+                bankConnected={bankConnected}
+                profilePictureUrl={profilePictureUrl} 
+                profileBannerUrl={profileBannerUrl} 
+                displayName={displayName} 
+                bio={bio} 
+                numberOfTips={numberOfTips} 
+                myProfilePictureUrl={user?.profile_picture_url} 
+                isAuthenticated={isAuthenticated} 
+                loginUser={navigateLogin} 
+                logoutUser={handleLogout} 
+                navigateMyProfile={navigateMyProfile} 
+            />
 
             {!error ? (
                 

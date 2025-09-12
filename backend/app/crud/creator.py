@@ -8,6 +8,7 @@ from app.utils.auth import hash_password
 from app.utils.constants.http_codes import (
     HTTP_400_BAD_REQUEST
 )
+from app.utils.exceptions.custom_exceptions import FieldValidationError
 from app.utils.logging import Logger, LogLevel
 from app.utils.constants.http_error_details import (
     EMAIL_USED_ERROR,
@@ -50,9 +51,9 @@ def create_user(db: Session, creator_in: CreatorCreate):
     ).first()
     if existing:
         if existing.email == creator_in.email.lower():
-            raise ValueError(EMAIL_USED_ERROR)
+            raise FieldValidationError(field="email", message=EMAIL_USED_ERROR)
         else:
-            raise ValueError(USERNAME_USED_ERROR)
+            raise FieldValidationError(field="username", message=USERNAME_USED_ERROR)
     hashed_password = hash_password(creator_in.password)
     creator = Creator(
         email=creator_in.email.lower(),

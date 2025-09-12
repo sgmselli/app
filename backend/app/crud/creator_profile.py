@@ -5,7 +5,7 @@ from typing import Optional
 
 from app.models.creator import Creator
 from app.models.creator_profile import CreatorProfile
-from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate
+from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate, CreatorProfileUploadPictures
 from app.utils.constants.http_error_details import CREATOR_PROFILE_NOT_FOUND_ERROR
 from app.utils.logging import LogLevel, Logger
 from app.utils.constants.http_codes import (
@@ -42,15 +42,22 @@ def create_user_profile(db: Session, user_id: int, creator_profile_in: CreatorPr
         creator_id = user_id,
         display_name = creator_profile_in.display_name,
         bio = creator_profile_in.bio,
-        youtube_channel_name = creator_profile_in.youtube_channel_name,
-        profile_picture_key = creator_profile_in.profile_picture_key,
-        profile_banner_key= creator_profile_in.profile_banner_key,
+        youtube_channel_name = creator_profile_in.youtube_channel_name
     )
     db.add(creator_profile)
     db.flush()
     return creator_profile
 
 def update_creator_profile(db: Session, creator_profile: CreatorProfile, update_in: CreatorProfileUpdate):
+
+    for field, value in update_in.model_dump(exclude_unset=True).items():
+        setattr(creator_profile, field, value)
+
+    db.add(creator_profile)
+    db.flush()
+    return creator_profile
+
+def update_creator_profile_pictures(db: Session, creator_profile: CreatorProfile, update_in: CreatorProfileUploadPictures):
 
     for field, value in update_in.model_dump(exclude_unset=True).items():
         setattr(creator_profile, field, value)

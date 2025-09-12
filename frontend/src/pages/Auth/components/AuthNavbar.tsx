@@ -20,11 +20,11 @@ const AuthNavbar: React.FC<AuthNavbarProps> = (props: AuthNavbarProps) => {
     }
 
     return (
-        <nav className="w-full h-[100px] flex items-center justify-between px-10">
+        <nav className="w-full h-[150px] flex items-center justify-between px-14">
             <button onClick={navigateLanding} className="cursor-pointer">
                 <Logo />
             </button>
-            <button className="text-lg font-light cursor-pointer hover:underline" onClick={navigateLink}>{props.linkText}</button>
+            <button className="text-md font-light cursor-pointer hover:underline" onClick={navigateLink}>{props.linkText}</button>
         </nav>
     );
 };

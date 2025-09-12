@@ -1,19 +1,21 @@
 import React, { useState } from "react";
+
 import Logo from "../../../components/Logo";
 import EditProfileModal from "./EditProfileModal";
 
 interface ProfileNavbarProps {
-  myProfilePicture?: string;
-  profilePictureUrl?: string;
-  profileBannerUrl?: string;
-  displayName?: string;
-  bio?: string;
-  numberOfTips?: number;
-  bankConnected?: boolean | null;
-  isLoggedInUser?: boolean | null;
+  myProfilePictureUrl: string | null;
+  profilePictureUrl: string | null;
+  profileBannerUrl: string | null;
+  displayName: string | null;
+  bio: string | null;
+  numberOfTips: number | null;
+  bankConnected: boolean | null;
+  isLoggedInUser: boolean | null;
+  navigateMyProfile: () => void;
   isAuthenticated: () => boolean
-  logoutUser?: () => void;
-  loginUser?: () => void;
+  logoutUser: () => void;
+  loginUser: () => void;
   onSave: (formData: {
     displayName: string;
     bio: string;
@@ -23,7 +25,7 @@ interface ProfileNavbarProps {
 }
 
 const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
-  myProfilePicture,
+  myProfilePictureUrl,
   profilePictureUrl,
   profileBannerUrl,
   displayName,
@@ -31,6 +33,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
   numberOfTips,
   bankConnected,
   isLoggedInUser,
+  navigateMyProfile,
   isAuthenticated,
   logoutUser,
   loginUser,
@@ -43,10 +46,10 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
     <nav className="w-full h-[150px] flex items-center justify-between px-14 pt-10 pb-6" >
       <div className="flex flex-row gap-6 items-center">
         {
-          profilePictureUrl ?
+          !!profilePictureUrl ?
             <img src={profilePictureUrl} className="h-[80px] w-[80px] object-cover rounded-xl  border-base-300" />
           :
-            <h1>{profilePictureUrl}</h1>
+            <Logo />
         }
         <div className="flex flex-col">
           <h1 className="text-xl font-semibold">{displayName}</h1>
@@ -78,7 +81,11 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
               initialProfileBanner={profileBannerUrl}
               onSave={onSave}
             />
-            <UserMenu logoutUser={logoutUser} profile_picture_url={myProfilePicture} />
+            <UserMenu 
+              myProfilePictureUrl={myProfilePictureUrl}
+              navigateMyProfile={navigateMyProfile} 
+              logoutUser={logoutUser} 
+            />
           </div>
         ) : (
           <button
@@ -94,11 +101,12 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
 };
 
 interface UserMenuProps {
-  profile_picture_url?: string | null;
+  myProfilePictureUrl: string | null;
+  navigateMyProfile: () => void;
   logoutUser: () => void;
 }
 
-function UserMenu({ logoutUser, profile_picture_url }: UserMenuProps) {
+function UserMenu({ myProfilePictureUrl, navigateMyProfile, logoutUser }: UserMenuProps) {
   return (
     <div className="dropdown dropdown-end">
       {/* Avatar button */}
@@ -107,9 +115,9 @@ function UserMenu({ logoutUser, profile_picture_url }: UserMenuProps) {
         role="button"
         className="w-11 h-11 rounded-full overflow-hidden cursor-pointer flex items-center justify-center bg-white shadow-xl"
       >
-        {profile_picture_url ? (
+        {myProfilePictureUrl ? (
           <img
-            src={profile_picture_url}
+            src={myProfilePictureUrl}
             alt="User avatar"
             className="w-full h-full object-cover"
           />
@@ -124,7 +132,10 @@ function UserMenu({ logoutUser, profile_picture_url }: UserMenuProps) {
         className="dropdown-content menu mt-3 w-40 rounded-lg bg-base-100 shadow"
       >
         <li>
-          <button onClick={logoutUser}>Logout</button>
+          <button onClick={navigateMyProfile}>My profile</button>
+        </li>
+        <li>
+          <button onClick={logoutUser}>Log out</button>
         </li>
       </ul>
     </div>
