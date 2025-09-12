@@ -1,23 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Country } from "../../types/country"; 
 import { getConnectBankUrl } from "../../api/payment"; 
 import type { ConnectBankRequest, ConnectBankResponse } from "../../types/payment";
 import Navbar from "../../components/Navbar";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Steps from "../../components/Steps";
 
+interface ErrorCheckoutModalProps {
+    setIsErrorModalOpen: (isOpen: boolean) => void;
+}
+
 const ConnectBank: React.FC = () => {
+
+  const location = useLocation();
+
   const [country, setCountry] = useState<keyof typeof Country>("UnitedKingdom");
   const [connecting, setConnecting] = useState(false);
 
-  const [open, setOpen] = useState(false); // country modal
-  const [laterModal, setLaterModal] = useState(false); // new modal
+  const [open, setOpen] = useState(false);
+  const [laterModal, setLaterModal] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useAuth();
 
   const navigate = useNavigate();
+
+  // Handle query params for Stripe success
+  useEffect(() => {
+      const params = new URLSearchParams(location.search);
+      const result = params.get("result");
+      if (result === "cancel") {
+          setIsErrorModalOpen(true);
+          navigate(location.pathname, { replace: true });
+      }
+  }, [location, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +46,8 @@ const ConnectBank: React.FC = () => {
       const response: ConnectBankResponse = await getConnectBankUrl(requestData);
       window.location.href = response.url;
     } catch (err) {
-      console.error(err);
-      setError("Failed to connect bank. Please try again.");
-    } finally {
       setConnecting(false);
+      setError("Failed to connect bank. Please try again.");
     }
   };
 
@@ -41,6 +57,12 @@ const ConnectBank: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen w-full">
+      {/* Stripe Checkout Error Modal */}
+        {isErrorModalOpen && (
+            <ErrorCheckoutModal
+                setIsErrorModalOpen={setIsErrorModalOpen}
+            />
+      )}
       <Navbar />
       <div className="flex flex-1 items-start justify-center w-[100%]">
         <form onSubmit={handleSubmit} className="w-full max-w-xl">
@@ -197,6 +219,34 @@ const ConnectBank: React.FC = () => {
       <Steps steps={4} currentStep={3} />
     </div>
   );
+};
+
+const ErrorCheckoutModal = ({
+    setIsErrorModalOpen,
+}: ErrorCheckoutModalProps) => {
+    return (
+        <dialog open className="modal modal-open">
+            <div className="modal-box max-w-md text-center p-8">
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">
+                    We had a problem connecting your bank 😔
+                </h2>
+                <p className="text-gray-600 mb-6">
+                    Your bank has not been connected. Please try again.
+                </p>
+                <div className="modal-action flex justify-center">
+                    <button
+                        className="btn btn-md primary-btn text-white rounded-lg border-0"
+                        onClick={() => setIsErrorModalOpen(false)}
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" className="modal-backdrop">
+                <button onClick={() => setIsErrorModalOpen(false)}>close</button>
+            </form>
+        </dialog>
+    );
 };
 
 export default ConnectBank;

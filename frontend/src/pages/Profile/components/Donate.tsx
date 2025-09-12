@@ -90,7 +90,7 @@ const Donate: React.FC<Props> = (props: Props) => {
                 <button
                     type='submit'
                     disabled={!props.bankConnected || loading}
-                    className="btn primary-btn btn-xl text-[16px] font-normal border-0 rounded-lg w-[100%] mt-5"
+                    className="btn primary-btn btn-xl text-[16px] font-medium border-0 rounded-lg w-[100%] mt-5"
                 >
                     {loading ?  <span className="loading loading-spinner"></span> : props.bankConnected ? `Tip ${props.currency}${(tipAmount*3).toString()}` : "Unavailable"}
                 </button>
