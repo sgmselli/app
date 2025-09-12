@@ -42,10 +42,8 @@ export const Country = {
   Sweden: "🇸🇪 Sweden",
   Switzerland: "🇨🇭 Switzerland",
   Thailand: "🇹🇭 Thailand",
-  UnitedArabEmirates: "🇦🇪 United Arab Emirates",
   UnitedKingdom: "🇬🇧 United Kingdom",
   UnitedStates: "🇺🇸 United States",
-  Uruguay: "🇺🇾 Uruguay"
 } as const;
 
 export type Country = (typeof Country)[keyof typeof Country];

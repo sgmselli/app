@@ -41,8 +41,14 @@ class CreatorProfile(Base):
 
     @property
     def profile_picture_url(self) -> Optional[str]:
-        return build_s3_url(self.profile_picture_key)
+        profile_picture_url = None
+        if self.profile_picture_key:
+            profile_picture_url = build_s3_url(self.profile_picture_key)
+        return profile_picture_url
 
     @property
     def profile_banner_url(self) -> Optional[str]:
-        return build_s3_url(self.profile_banner_key)
+        profile_banner_key = None
+        if self.profile_picture_key:
+            profile_banner_key = build_s3_url(self.profile_banner_key)
+        return profile_banner_key

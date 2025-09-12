@@ -12,6 +12,7 @@ from app.utils.constants.http_codes import (
     HTTP_201_CREATED,
     HTTP_404_NOT_FOUND
 )
+from app.utils.exceptions.custom_exceptions import FieldValidationError
 from app.utils.logging import Logger, LogLevel
 from app.utils.s3 import build_s3_url
 
@@ -43,13 +44,12 @@ async def create(creator_in: CreatorCreate, db: Session = Depends(get_db)):
         )
         db.commit()
         return user
-    except ValueError as e:
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+    except FieldValidationError as e:
+        db.rollback()
+        raise e
     except Exception as e:
+        db.rollback()
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            status_code=500,
+            detail=f"Unexpected error: {str(e)}"
         )

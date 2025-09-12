@@ -44,7 +44,5 @@ class Country(enum.Enum):
     Sweden = "Sweden"
     Switzerland = "Switzerland"
     Thailand = "Thailand"
-    UnitedArabEmirates = "UnitedArabEmirates"
     UnitedKingdom = "UnitedKingdom"
     UnitedStates = "UnitedStates"
-    Uruguay = "Uruguay"

@@ -1,31 +1,34 @@
 from fileinput import filename
 
 from fastapi import APIRouter, Depends, Form, File, UploadFile
-from fastapi.exceptions import HTTPException 
+from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
-from starlette.status import HTTP_400_BAD_REQUEST
 
 from app.external_services.aws_s3_client import AwsS3Client
 from app.utils.constants.http_codes import (
     HTTP_200_OK,
-    HTTP_201_CREATED,       
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_500_INTERNAL_SERVER_ERROR
 )
-from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate, CreatorProfileOut
+from app.schemas.creator_profile import CreatorProfileCreate, CreatorProfileUpdate, CreatorProfileOut, \
+    CreatorProfileUploadPictures
 from app.db.base import Creator, Tip
 from app.db.session import get_db
 from app.crud import creator_profile as crud_creator_profile
-from app.utils.auth import get_current_user, get_optional_user, get_current_user_with_profile
+from app.utils.auth import get_current_user, get_optional_user
 from app.utils.constants.http_error_details import (
     CREATOR_PROFILE_NOT_FOUND_ERROR,
     CREATOR_PROFILE_ALREADY_EXISTS,
     CREATOR_PROFILE_DOES_NOT_EXIST
 )
+from app.utils.exceptions.custom_exceptions import FieldValidationError
 from app.utils.logging import Logger, LogLevel
 from app.utils.s3 import build_s3_url, upload_profile_picture_to_s3, delete_profile_picture_from_s3, \
     upload_profile_banner_to_s3, delete_profile_banner_from_s3
+from app.utils.upload import validate_uploaded_image
 
 router = APIRouter()
 
@@ -63,70 +66,83 @@ async def get(username: str, db: Session = Depends(get_db), current_user: Option
             status_code=HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-    
+
 @router.post("/create", response_model=CreatorProfileOut, status_code=HTTP_201_CREATED)
 async def create(
-        display_name: str = Form(...),
-        bio: str = Form(...),
-        youtube_channel_name: str = Form(...),
-        profile_picture: Optional[UploadFile] = File(None),
-        profile_banner: Optional[UploadFile] = File(None),
-        current_user: Creator = Depends(get_current_user),
-        db: Session = Depends(get_db)
-):
+    profile_in: CreatorProfileCreate,
+    current_user: Creator = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    ):
+    if current_user.has_profile:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=CREATOR_PROFILE_ALREADY_EXISTS)
     try:
-        if current_user.has_profile:
-            raise HTTPException(
-                status_code=HTTP_400_BAD_REQUEST,
-                detail=CREATOR_PROFILE_ALREADY_EXISTS
-            )
-        user_id = current_user.id
-        s3_client = AwsS3Client()
-        profile_picture_key = None
-        profile_banner_key = None
-        if profile_picture:
-            profile_picture_key = f"{user_id}/profile_picture/{profile_picture.filename}"
-            if not s3_client.upload_fileobj(profile_picture_key, profile_picture.file):
-                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Error uploading profile picture")
-        if profile_banner:
-            profile_banner_key = f"{user_id}/profile_banner/{profile_banner.filename}"
-            if not s3_client.upload_fileobj(profile_banner_key, profile_banner.file):
-                s3_client.delete_object(profile_picture_key)
-                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Error uploading profile banner")
         creator_profile = crud_creator_profile.create_user_profile(
             db=db,
-            user_id=user_id,
-            creator_profile_in=CreatorProfileCreate(
-                display_name=display_name,
-                bio=bio,
-                youtube_channel_name=youtube_channel_name,
-                profile_picture_key=profile_picture_key if profile_picture else None,
-                profile_banner_key=profile_banner_key
-            ),
+            user_id=current_user.id,
+            creator_profile_in=profile_in,
         )
         db.commit()
-        return CreatorProfileOut(
-            id=creator_profile.id,
-            display_name=creator_profile.display_name,
-            bio=creator_profile.bio,
-            created_at=creator_profile.created_at,
-            is_bank_connected=False,
-            currency=None,
-            tips=[],
-            number_of_tips=0,
-            youtube_channel_name=creator_profile.youtube_channel_name,
-            profile_picture_url="",
-            profile_banner_url=""
-        )
-
+        return creator_profile
     except Exception as e:
+        db.rollback()
+        Logger.log(LogLevel.ERROR, f"Error creating profile: {str(e)}")
         raise HTTPException(
             status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=f"Error creating profile",
         )
 
+@router.put("/profile-pictures")
+async def upload_profile_pictures(
+    profile_picture: UploadFile = File(None),
+    profile_banner: UploadFile = File(None),
+    current_user: Creator = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not current_user.has_profile:
+        raise HTTPException(status_code=400, detail=CREATOR_PROFILE_DOES_NOT_EXIST)
+
+    profile = current_user.profile
+    s3_client = AwsS3Client()
+    args = {}
+
+    try:
+        if profile_picture:
+            await validate_uploaded_image(image=profile_picture, field="profile_picture")
+        if profile_banner:
+            await validate_uploaded_image(image=profile_banner, field="profile_banner")
+    except FieldValidationError as e:
+        raise e
+
+    if profile_picture:
+        profile_picture_key = upload_profile_picture_to_s3(
+            s3_client=s3_client,
+            user_id=current_user.id,
+            filename=profile_picture.filename,
+            file=profile_picture.file
+        )
+        args["profile_picture_key"] = profile_picture_key
+
+    if profile_banner:
+        profile_banner_key = upload_profile_banner_to_s3(
+            s3_client=s3_client,
+            user_id=current_user.id,
+            filename=profile_banner.filename,
+            file=profile_banner.file
+        )
+        args["profile_banner_key"] = profile_banner_key
+
+    update_in = CreatorProfileUploadPictures(**args)
+    updated_profile = crud_creator_profile.update_creator_profile_pictures(db, profile, update_in)
+    db.commit()
+
+    return {
+        "profile_picture_url": updated_profile.profile_picture_url,
+        "profile_banner_url": updated_profile.profile_banner_url
+    }
+
+
 @router.patch("/update")
-def update_profile(
+async def update_profile(
     display_name: str = Form(None),
     bio: str = Form(None),
     profile_picture: UploadFile = File(None),
@@ -137,19 +153,38 @@ def update_profile(
     if not current_user.has_profile:
         raise HTTPException(status_code=400, detail=CREATOR_PROFILE_DOES_NOT_EXIST)
 
+    if not display_name and not bio and not profile_picture and not profile_banner:
+        return {}
+
     profile = current_user.profile
     old_picture_key = profile.profile_picture_key
     old_banner_key = profile.profile_banner_key
     new_picture_key = None
     new_banner_key = None
     s3_client = AwsS3Client()
-    args = {}
 
     try:
-        if display_name is not None:
-            args["display_name"] = display_name
-        if bio is not None:
-            args["bio"] = bio
+        update_text_args = {}
+        if display_name:
+            update_text_args["display_name"] = display_name
+        if bio:
+            update_text_args["bio"] = bio
+        update_text_data = CreatorProfileUpdate(
+            **update_text_args
+        )
+    except ValueError as e:
+        raise e
+
+    try:
+        if profile_picture:
+            await validate_uploaded_image(image=profile_picture, field="profile_picture")
+        if profile_banner:
+            await validate_uploaded_image(image=profile_banner, field="profile_banner")
+    except FieldValidationError as e:
+        raise e
+
+    try:
+        update_pictures_args = {}
         if profile_picture:
             #Upload new profile picture
             new_picture_key = upload_profile_picture_to_s3(
@@ -158,7 +193,7 @@ def update_profile(
                 filename=profile_picture.filename,
                 file=profile_picture.file
             )
-            args["profile_picture_key"] = new_picture_key
+            update_pictures_args['profile_picture_key'] = new_picture_key
         if profile_banner:
             # Upload new profile banner
             new_banner_key = upload_profile_banner_to_s3(
@@ -167,10 +202,15 @@ def update_profile(
                 filename=profile_banner.filename,
                 file=profile_banner.file
             )
-            args["profile_banner_key"] = new_banner_key
+            update_pictures_args['profile_banner_key'] = new_banner_key
 
-        update_in = CreatorProfileUpdate(**args)
-        updated_profile = crud_creator_profile.update_creator_profile(db, profile, update_in)
+        update_upload_data = CreatorProfileUploadPictures(
+            **update_pictures_args
+        )
+
+        updated_profile_text = crud_creator_profile.update_creator_profile(db, profile, update_text_data)
+        updated_profile_uploads= crud_creator_profile.update_creator_profile_pictures(db, profile, update_upload_data)
+
         db.commit()
 
         if new_picture_key and old_picture_key:
@@ -188,15 +228,16 @@ def update_profile(
 
         profile_picture_url = None
         profile_banner_url = None
-        if updated_profile.profile_picture_key:
-            profile_picture_url=build_s3_url(updated_profile.profile_picture_key)
-        if updated_profile.profile_banner_key:
-            profile_banner_url = build_s3_url(updated_profile.profile_banner_key)
+
+        if updated_profile_uploads.profile_picture_key:
+            profile_picture_url=build_s3_url(updated_profile_uploads.profile_picture_key)
+        if updated_profile_uploads.profile_banner_key:
+            profile_banner_url = build_s3_url(updated_profile_uploads.profile_banner_key)
 
         return CreatorProfileOut(
-            id=updated_profile.id,
-            display_name=updated_profile.display_name,
-            bio=updated_profile.bio,
+            id=updated_profile_text.id,
+            display_name=updated_profile_text.display_name,
+            bio=updated_profile_text.bio,
             profile_picture_url=profile_picture_url,
             profile_banner_url=profile_banner_url,
         )

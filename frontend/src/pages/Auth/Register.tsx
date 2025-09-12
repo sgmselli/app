@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { register } from "../../api/auth";
 import { useAuth } from "../../contexts/AuthContext";
 import AuthNavbar from "./components/AuthNavbar";
+import Input, { InputLeftIcon } from "../../components/elements/input";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -11,19 +12,15 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
-  const navigateLogin = () => {
-    navigate('/login')
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setErrors({});
     try {
       await register({username: username, email: email, password: password, confirm_password: confirmPassword});
       try {
@@ -42,8 +39,14 @@ const Register: React.FC = () => {
         setLoading(false);
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || "Register failed");
-    }
+      console.log(err)
+        const apiErrors = err?.response?.data?.errors || [];
+        const newErrors: Record<string, string> = {};
+        apiErrors.forEach((e: { field: string; message: string }) => {
+          newErrors[e.field] = e.message;
+        });
+        setErrors(newErrors);
+      }
   };
 
   return (
@@ -53,56 +56,57 @@ const Register: React.FC = () => {
         linkUrl="/login"
       />
 
-      <div className="flex flex-1 items-start justify-center w-[100%] pt-[10%]">
+      <div className="flex flex-1 items-start justify-center w-[100%] pt-[6%]">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <h2 className="text-4xl font-medium mb-10 text-center">Create your account</h2>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-
+          <div className="mb-10 text-center">
+            <h2 className="text-4xl font-medium">Create your account</h2>
+          </div>
           <div className="form-control mb-8">
-            <input
+            <InputLeftIcon
               id="username"
               type="text"
               value={username}
               placeholder="Username"
-              onChange={e => setUsername(e.target.value)}
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium focus:outline-none focus:border-2 focus:bg-white"
+              icon="www.tubetip.co/"
+              onChange={setUsername}
+              required={true}
+              error={errors.username}
             />
           </div>
 
           <div className="form-control mb-8">
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               placeholder="Email"
-              onChange={e => setEmail(e.target.value)}
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium focus:outline-none focus:border-2 focus:bg-white"
+              onChange={setEmail}
+              required={true}
+              error={errors.email}
             />
           </div>
 
           <div className="form-control mb-8">
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
               placeholder="Password"
-              onChange={e => setPassword(e.target.value)}
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium  focus:outline-none focus:border-2 focus:bg-white"
+              onChange={setPassword}
+              required={true}
+              error={errors.password}
             />
           </div>
 
           <div className="form-control mb-8">
-            <input
+            <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               placeholder="Confirm Password"
-              onChange={e => setConfirmPassword(e.target.value)}
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium focus:outline-none focus:border-2 focus:bg-white"
+              onChange={setConfirmPassword}
+              required={true}
+              error={errors.confirm_password}
             />
           </div>
 

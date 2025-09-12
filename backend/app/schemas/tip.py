@@ -6,7 +6,6 @@ class TipCreate(BaseModel):
     amount: int
     name: Optional[str] = None
     message: Optional[str] = None
-    isPrivate: bool = False
     creator_profile_id: int
     stripe_session_id: Optional[str] = None
 
@@ -15,7 +14,6 @@ class TipOut(BaseModel):
     amount: int
     name: Optional[str]
     message: Optional[str]
-    isPrivate: bool
     created_at: datetime
 
     class Config:

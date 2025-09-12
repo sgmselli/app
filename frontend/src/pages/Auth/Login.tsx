@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../contexts/AuthContext";
 import AuthNavbar from "./components/AuthNavbar";
+import Input from "../../components/elements/input";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string | string>("");
@@ -30,7 +31,7 @@ const Login: React.FC = () => {
       }
     } catch (err: any) {
       setLoading(false);
-      setError(err.response?.data?.error || "Login failed");
+      setError("Your email or password was incorrect");
     }
   };
 
@@ -40,37 +41,38 @@ const Login: React.FC = () => {
         linkText="Don't have an account? Sign up"
         linkUrl="/register"
       />
-
-      <div className="flex flex-1 items-start justify-center w-[100%] pt-[10%]">
+      <div className="flex flex-1 items-start justify-center w-[100%] pt-[6%]">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-sm"
+          className="w-full max-w-md"
         >
-          <h2 className="text-4xl font-medium mb-10 text-center">Welcome back</h2>
-
-          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-
+          <div className="mb-10 text-center">
+            <h2 className="text-4xl font-medium mb-4">Welcome back</h2>
+            <h4 className="text-lg font-normal mb-10 text-center text-gray-500">
+              Enter your login credentials to access your TubeTip account.
+            </h4>
+            {error && <h5 className="text-red-500 text-md">{error}</h5>}
+          </div>
+          
           <div className="form-control mb-8">
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={setEmail}
               placeholder="Email"
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium  focus:outline-none focus:border-2 focus:bg-white"
+              required={true}
             />
           </div>
 
           <div className="form-control mb-8">
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={setPassword}
               placeholder="Password"
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium  focus:outline-none focus:border-2 focus:bg-white"
+              required={true}
             />
           </div>
 

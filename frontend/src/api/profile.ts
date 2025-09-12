@@ -1,5 +1,5 @@
 import { apiAuth } from "./index";
-import type { CreateProfileRequest, CreateProfileResponse, GetProfileRequest, GetProfileResponse, GetCurrentUserResponse, UpdateProfileRequest, UpdateProfileResponse } from "../types/profile"
+import type { CreateProfileRequest, CreateProfileResponse, GetProfileRequest, GetProfileResponse, GetCurrentUserResponse, UpdateProfileRequest, UpdateProfileResponse, UploadProfileImagesRequest, UploadProfileImagesResponse } from "../types/profile"
 
 export async function getMyProfileData() : Promise<GetCurrentUserResponse>{
   const response = await apiAuth.get(`creator/me`);
@@ -7,22 +7,29 @@ export async function getMyProfileData() : Promise<GetCurrentUserResponse>{
 }
 
 export async function createCreatorProfile(requestData: CreateProfileRequest): Promise<CreateProfileResponse> {
+  const response = await apiAuth.post(`creator/profile/create`, requestData);
+  return response.data;
+}
+
+export async function updateCreatorProfilePictures(requestData: UploadProfileImagesRequest): Promise<UploadProfileImagesResponse> {
   const formData = new FormData();
-  formData.append("display_name", requestData.display_name);
-  formData.append("bio", requestData.bio);
-  formData.append("youtube_channel_name", requestData.youtube_channel_name);
-  if (requestData.profile_picture) {
-    formData.append("profile_picture", requestData.profile_picture);
+  const { profile_picture, profile_banner } = requestData
+
+  if (!profile_picture && !profile_banner) {
+    return {}
   }
-  if (requestData.profile_banner) {
-    formData.append("profile_banner", requestData.profile_banner);
+
+  if (profile_picture) {
+    formData.append("profile_picture", profile_picture);
   }
-  const response = await apiAuth.post(`creator/profile/create`, formData, {
+  if (profile_banner) {
+    formData.append("profile_banner", profile_banner);
+  }
+  const response = await apiAuth.put(`creator/profile/profile-pictures`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
-
   return response.data;
 }
 

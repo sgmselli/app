@@ -58,10 +58,8 @@ STRIPE_COUNTRY_DATA: dict[Country, StripeCountryDetails] = {
     Country.Sweden: StripeCountryDetails("SE", "sek"),
     Country.Switzerland: StripeCountryDetails("CH", "chf"),
     Country.Thailand: StripeCountryDetails("TH", "thb"),
-    Country.UnitedArabEmirates: StripeCountryDetails("AE", "aed"),
     Country.UnitedKingdom: StripeCountryDetails("GB", "gbp"),
     Country.UnitedStates: StripeCountryDetails("US", "usd"),
-    Country.Uruguay: StripeCountryDetails("UY", "usd"),
 }
 
 def get_stripe_country_details(country: Country) -> StripeCountryDetails:
@@ -114,7 +112,7 @@ def calculate_application_fee(amount: int, percent_fee: float) -> int:
     fee = int(amount * (percent_fee / 100))
     return fee
 
-def create_stripe_checkout_session_link(creator_profile_id: int, username: str, isPrivate:bool, connected_account_id: str, display_name:str, currency:str, payment_amount: float, application_fee_percentage: float,  message: Optional[str] = None, name: Optional[str] = None):
+def create_stripe_checkout_session_link(creator_profile_id: int, username: str, connected_account_id: str, display_name:str, currency:str, payment_amount: float, application_fee_percentage: float,  message: Optional[str] = None, name: Optional[str] = None):
     application_fee_amount = calculate_application_fee(payment_amount, application_fee_percentage)
     success_url = f"{settings.frontend_url}/{username}?result=success?amount={payment_amount}"
     cancel_url = f"{settings.frontend_url}/{username}?result=cancel?amount={payment_amount}"
@@ -147,7 +145,6 @@ def create_stripe_checkout_session_link(creator_profile_id: int, username: str, 
             "creator_profile_id": str(creator_profile_id), 
             "message": message,
             "name": name,
-            "isPrivate": str(isPrivate)
         },
     )
     return session.url

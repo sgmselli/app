@@ -76,7 +76,6 @@ async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session
             username=username,
             name=payload.name,
             message=payload.message,
-            isPrivate=payload.isPrivate,
             connected_account_id=profile.stripe_account_id,
             display_name=profile.display_name,
             currency=profile.get_currency,
@@ -113,7 +112,6 @@ async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
 
         customer = stripe.Customer.retrieve(session["customer"])
         email = customer.get("email")
-        isPrivate = session["metadata"].get("isPrivate", "false").lower() == "true"
         creator_profile_id = int(session["metadata"].get("creator_profile_id"))
         amount = int(session["amount_total"])
         currency=session["currency"]
@@ -129,7 +127,6 @@ async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
             amount=amount,
             name=name,
             message=message,
-            isPrivate=isPrivate,
             stripe_session_id=session["id"]
         )
         create_tip(db=db, tip_data=tip_data)

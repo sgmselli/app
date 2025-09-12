@@ -1,5 +1,9 @@
 import { useRef, useState, useEffect, useMemo } from "react";
+
 import { updateCreatorProfile } from "../../../api/profile";
+import Input, { ProfileBannerInput, ProfilePictureInput } from "../../../components/elements/input";
+import Label from "../../../components/elements/label";
+import Textarea from "../../../components/elements/textarea";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -10,10 +14,10 @@ interface EditProfileModalProps {
     profilePictureUrl: string;
     profileBannerUrl: string;
   }) => void;
-  initialDisplayName: string;
-  initialBio: string;
-  initialProfilePicture?: string | null; // URL from backend
-  initialProfileBanner?: string | null;  // URL from backend
+  initialDisplayName: string | null;
+  initialBio: string | null;
+  initialProfilePicture?: string | null; 
+  initialProfileBanner?: string | null;
 }
 
 export default function EditProfileModal({
@@ -29,10 +33,10 @@ export default function EditProfileModal({
 
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
-  const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [displayName, setDisplayName] = useState<string | null>(initialDisplayName);
   const [bio, setBio] = useState(initialBio);
 
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -48,7 +52,6 @@ export default function EditProfileModal({
     modalRef.current?.close();
   }
 
-  // Detect changes
   const hasChanges = useMemo(() => {
     return (
       displayName !== initialDisplayName ||
@@ -76,7 +79,12 @@ export default function EditProfileModal({
       });
       onClose();
     } catch (err: any) {
-        setError(err.response?.data?.error || "We had an error updating your profile. Try again later.");
+      const apiErrors = err?.response?.data?.errors || [];
+      const newErrors: Record<string, string> = {};
+      apiErrors.forEach((e: { field: string; message: string }) => {
+        newErrors[e.field] = e.message;
+      });
+      setErrors(newErrors);
     } finally {
         setLoading(false);
     }
@@ -95,90 +103,39 @@ export default function EditProfileModal({
 
         <form onSubmit={handleSubmit} className="overflow-y-auto">
           {/* Profile picture upload */}
-          <div className="form-control mb-8 flex justify-center">
-            <label
-              htmlFor="profilePicture"
-              className="w-32 h-32 rounded-xl overflow-hidden bg-base-200 border border-gray-300 flex items-center justify-center 
-                cursor-pointer hover:opacity-80 transition"
-            >
-              {profilePicture ? (
-                <img
-                  src={URL.createObjectURL(profilePicture)}
-                  alt="Profile preview"
-                  className="object-cover w-full h-full"
-                />
-              ) : initialProfilePicture ? (
-                <img
-                  src={initialProfilePicture}
-                  alt="Current profile"
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <span className="text-gray-400 font-semibold text-sm text-center">
-                  Upload profile picture
-                </span>
-              )}
-            </label>
-            <input
-              id="profilePicture"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
-              className="hidden"
+          <div className="form-control mb-8 flex flex-col items-center justify-center">
+            <ProfilePictureInput
+              profilePicture={profilePicture}
+              initialProfilePicture={initialProfilePicture}
+              setProfilePicture={setProfilePicture}
+              error={errors.profile_picture}
             />
           </div>
 
           {/* Banner upload */}
           <div className="form-control mb-8">
-            <label
-              htmlFor="profileBanner"
-              className="w-full h-[180px] rounded-xl overflow-hidden bg-base-200 flex items-center justify-center 
-                border border-gray-300 cursor-pointer hover:opacity-80 transition"
-            >
-              {profileBanner ? (
-                <img
-                  src={URL.createObjectURL(profileBanner)}
-                  alt="Banner preview"
-                  className="object-cover w-full h-full"
-                />
-              ) : initialProfileBanner ? (
-                <img
-                  src={initialProfileBanner}
-                  alt="Current banner"
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <span className="text-gray-400 font-semibold text-sm">
-                  Upload profile banner
-                </span>
-              )}
-            </label>
-            <input
-              id="profileBanner"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setProfileBanner(e.target.files?.[0] || null)}
-              className="hidden"
+            <ProfileBannerInput
+              profileBanner={profileBanner}
+              initialProfileBanner={initialProfileBanner}
+              setProfileBanner={setProfileBanner}
+              error={errors.profile_banner}
             />
           </div>
 
           {/* Display Name */}
           <div className="form-control mb-8">
-            <label
+            <Label
               htmlFor="displayName"
-              className="mb-2 block font-medium text-gray-700"
-            >
-              Youtube channel name
-            </label>
-            <input
+              labelName="Youtube channel name"           
+            />
+            <Input
               id="displayName"
               type="text"
               value={displayName}
               placeholder="Name"
-              onChange={(e) => setDisplayName(e.target.value)}
-              required
-              className="input input-lg w-full bg-base-200 rounded-lg text-[14px] font-medium 
-                focus:outline-none focus:border-2 focus:bg-white"
+              onChange={setDisplayName}
+              required={true}
+              error={errors.display_name}
             />
           </div>
 
@@ -190,14 +147,13 @@ export default function EditProfileModal({
             >
               About
             </label>
-            <textarea
+            <Textarea
               id="bio"
               value={bio}
               placeholder="Write about your Youtube channel, how it helps its subscribers and how your contribution can help..."
-              onChange={(e) => setBio(e.target.value)}
-              required
-              className="textarea textarea-lg w-full bg-base-200 rounded-lg min-h-[150px] resize-none 
-                !text-[14px] font-medium focus:outline-none focus:border-2 focus:bg-white"
+              onChange={setBio}
+              required={true}
+              error={errors.bio}
             />
           </div>
 

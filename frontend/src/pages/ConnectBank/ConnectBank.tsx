@@ -44,16 +44,17 @@ const ConnectBank: React.FC = () => {
       <Navbar />
       <div className="flex flex-1 items-start justify-center w-[100%]">
         <form onSubmit={handleSubmit} className="w-full max-w-xl">
-          {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
-
-          <h2 className="text-4xl font-medium mb-4 text-center text-gray-700">
-            Connect your bank
-          </h2>
-          <h4 className="text-lg font-normal mb-10 text-center text-gray-500">
-            You will need to connect your bank to accept payments from
-            supporters. You will be redirected to Stripe to handle this securely.
-          </h4>
-
+          <div className="mb-10 text-center">
+            <h2 className="text-4xl font-medium mb-4 text-gray-700">
+              Connect your bank
+            </h2>
+            <h4 className="text-lg font-normal text-gray-500">
+              You will need to connect your bank to accept payments from
+              supporters. You will be redirected to Stripe to handle this securely.
+            </h4>
+            {error && <h2 className="text-md text-error">{error}</h2>}
+          </div>
+          
           {/* Country picker */}
           <div className="form-control mb-8">
             <label
@@ -132,7 +133,6 @@ const ConnectBank: React.FC = () => {
             )}
           </div>
 
-          {/* Main connect button */}
           <button
             type="submit"
             className="btn btn-lg primary-btn border-0 rounded-lg w-full font-normal text-[16px] focus:outline-none"
@@ -145,14 +145,11 @@ const ConnectBank: React.FC = () => {
             )}
           </button>
 
-          {/* Divider */}
           <div className="flex items-center my-6">
             <hr className="flex-grow border-gray-300" />
             <span className="mx-4 text-gray-500 text-sm font-medium">or</span>
             <hr className="flex-grow border-gray-300" />
           </div>
-
-          {/* Later button */}
           <button
             type="button"
             className="btn btn-lg w-full rounded-lg border border-gray-300 bg-white text-gray-700 font-normal text-[16px] hover:bg-gray-100"
@@ -160,9 +157,8 @@ const ConnectBank: React.FC = () => {
           >
             Come back to this later
           </button>
-
-          {/* Later modal */}
-          {laterModal && (
+        </form>
+        {laterModal && (
             <dialog open className="modal modal-open">
               <div className="modal-box max-w-lg p-8">
                 <h3 className="font-semibold text-xl text-gray-800 mb-3">
@@ -175,12 +171,14 @@ const ConnectBank: React.FC = () => {
 
                 <div className="modal-action flex justify-end gap-3">
                   <button
+                    type="button"
                     className="btn btn-md rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
                     onClick={() => setLaterModal(false)}
                   >
                     Go Back
                   </button>
                   <button
+                    type="button"
                     className="btn btn-md primary-btn border-0 rounded-lg text-white"
                     onClick={() => {
                       navigateProfile();
@@ -195,10 +193,8 @@ const ConnectBank: React.FC = () => {
               </form>
             </dialog>
           )}
-        </form>
       </div>
       <Steps steps={4} currentStep={3} />
-
     </div>
   );
 };
