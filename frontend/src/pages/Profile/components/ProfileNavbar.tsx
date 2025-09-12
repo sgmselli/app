@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { Copy } from "lucide-react";
 
 import Logo from "../../../components/Logo";
 import EditProfileModal from "./EditProfileModal";
 
 interface ProfileNavbarProps {
-  myProfilePictureUrl: string | null;
+  username?: string;
+  myProfilePictureUrl?: string;
   profilePictureUrl: string | null;
   profileBannerUrl: string | null;
   displayName: string | null;
@@ -25,6 +27,7 @@ interface ProfileNavbarProps {
 }
 
 const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
+  username,
   myProfilePictureUrl,
   profilePictureUrl,
   profileBannerUrl,
@@ -62,6 +65,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
       <div>
         {isAuthenticated() ? (
           <div className="flex flex-row items-center justify-center gap-4">
+            <CopyUrl username={username} />
             {
               isLoggedInUser && (
                 <button
@@ -101,7 +105,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
 };
 
 interface UserMenuProps {
-  myProfilePictureUrl: string | null;
+  myProfilePictureUrl?: string;
   navigateMyProfile: () => void;
   logoutUser: () => void;
 }
@@ -138,6 +142,78 @@ function UserMenu({ myProfilePictureUrl, navigateMyProfile, logoutUser }: UserMe
           <button onClick={logoutUser}>Log out</button>
         </li>
       </ul>
+    </div>
+  );
+}
+
+type CopyUrlProps = {
+  username?: string;
+  urlPrefix?: string;
+};
+
+function CopyUrl({
+  username,
+  urlPrefix = "www.tubetip.co",
+}: CopyUrlProps) {
+  const [copied, setCopied] = useState(false);
+  const url = `${urlPrefix}/${username}`;
+
+  const handleCopy = async () => {
+    try {
+      if (!username) return;
+      // Prefer modern API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for older browsers
+        const el = document.createElement("textarea");
+        el.value = url;
+        el.setAttribute("readonly", "");
+        el.style.position = "absolute";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+      }
+      setCopied(true);
+      window.getSelection()?.removeAllRanges();
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
+  };
+
+  const handleFocusSelect = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.select();
+  };
+
+  return (
+    <div className={`flex items-center gap-0 cursor-pointer`} onClick={handleCopy}>
+      <div
+        aria-label="Profile URL"
+        className="flex justify-center items-center text-sm bg-base-200 rounded-l-lg rounded-r-none border border-gray-200 
+                  focus:outline-none focus:ring-offset-0 h-10 px-4"
+        onFocus={handleFocusSelect}
+        onClick={(e) => (e.currentTarget as HTMLInputElement).select()}
+      >
+        {url}
+      </div>
+
+      <button
+        type="button"
+        aria-label={copied ? "Copied" : "Copy profile URL"}
+        className={`flex items-center gap-2 px-4 rounded-l-none rounded-r-lg border border-l-0 border-gray-200 
+                    bg-white hover:bg-gray-50 focus:outline-none h-10`}
+      >
+        {copied ? (
+          <span className="text-sm font-medium">Copied!</span>
+        ) : (
+          <>
+            <span className="text-sm font-medium">Share</span>
+            <Copy size={16} />
+          </>
+        )}
+      </button>
     </div>
   );
 }
