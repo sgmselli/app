@@ -1,18 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../components/Logo";
+import { register } from "../../../api/auth";
 
 interface AuthNavbarProps {
-  linkText: string;
-  linkUrl: string;
+  route: string;
 }
 
-const AuthNavbar: React.FC<AuthNavbarProps> = (props: AuthNavbarProps) => {
+const AuthNavbar: React.FC<AuthNavbarProps> = ({route}: AuthNavbarProps) => {
 
     const navigate = useNavigate()
 
     const navigateLink = () => {
-        navigate(props.linkUrl)
+        if (route == "register") {
+            navigate("/register")
+        } if (route == "login") {
+            navigate("/login")
+        }
     }
 
     const navigateLanding = () => {
@@ -20,11 +24,18 @@ const AuthNavbar: React.FC<AuthNavbarProps> = (props: AuthNavbarProps) => {
     }
 
     return (
-        <nav className="w-full h-[150px] flex items-center justify-between px-14">
+        <nav className="w-full h-[90px] flex items-center justify-between px-6">
             <button onClick={navigateLanding} className="cursor-pointer">
                 <Logo />
             </button>
-            <button className="text-md font-light cursor-pointer hover:underline" onClick={navigateLink}>{props.linkText}</button>
+            <div className="text-md font-light">
+                {route === "register" && (
+                    <h4><span className="hidden sm:inline">Have an account?</span> <span tabIndex={0} onClick={navigateLink} className="underline cursor-pointer hover:no-underline">Sign in</span></h4>
+                )}
+                {route === "login" && (
+                    <h4><span className="hidden sm:inline">Don't have an account?</span> <span tabIndex={0} onClick={navigateLink} className="underline cursor-pointer hover:no-underline">Sign up</span></h4>
+                )}
+            </div>
         </nav>
     );
 };

@@ -52,14 +52,16 @@ const Register: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen w-full">
       <AuthNavbar
-        linkText="Have an account? Sign in"
-        linkUrl="/login"
+        route="login"
       />
 
-      <div className="flex flex-1 items-start justify-center w-[100%] pt-[6%]">
-        <form onSubmit={handleSubmit} className="w-full max-w-md">
+      <div className="flex flex-1 items-center justify-center pb-40">
+        <form 
+          onSubmit={handleSubmit} 
+          className="w-[90%] sm:w-full sm:max-w-md md:max-w-lg bg-white rounded-xl"
+        >
           <div className="mb-10 text-center">
-            <h2 className="text-4xl font-medium">Create your account</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4">Create your account</h2>
           </div>
           <div className="form-control mb-8">
             <InputLeftIcon
@@ -110,7 +112,7 @@ const Register: React.FC = () => {
             />
           </div>
 
-        <button type="submit" className="btn btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none" disabled={loading}>
+        <button type="submit" className="btn btn-md sm:btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none" disabled={loading}>
             {
               loading ?
                 <span className="loading loading-spinner"></span>

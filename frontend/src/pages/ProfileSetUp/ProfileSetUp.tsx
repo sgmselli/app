@@ -44,11 +44,16 @@ const ProfileSetUp: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen w-full">
         <Navbar />
+        <div
+          className="inline sm:hidden pb-10 sm:pb-0"
+        >
+          <Steps steps={4} currentStep={1} />
+        </div>
         <div className="flex flex-1 items-start justify-center w-full pb-5">
-          <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto pb-8">
+          <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-xl mx-auto pb-8">
             <div className="mb-10 text-center mb-10">
-              <h2 className="text-4xl font-medium mb-4 text-center">Complete your page</h2>
-              <h4 className="text-lg font-normal text-center text-gray-500">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4">Complete your page</h2>
+              <h4 className="text-md sm:text-lg font-normal mb-6 text-gray-500">
                 You will need to write some information about your Youtube channel.
               </h4>
             </div>
@@ -84,7 +89,7 @@ const ProfileSetUp: React.FC = () => {
                 required={true}
                 error={errors.youtube_channel_name}
               />
-              <p className="mt-2 text-sm text-gray-500 leading-snug break-words">
+              <p className="mt-2 text-xs text-gray-500 leading-snug break-words">
                 E.g. <span className="font-medium">www.youtube.com/@TubeTip</span> has
                 channel name <span className="font-medium">TubeTip</span>.
               </p>
@@ -111,7 +116,7 @@ const ProfileSetUp: React.FC = () => {
 
             <button
               type="submit"
-              className="btn btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none"
+              className="btn btn-md sm:btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none"
               disabled={loading}
             >
               {loading ? (
@@ -122,7 +127,11 @@ const ProfileSetUp: React.FC = () => {
             </button>
           </form>
         </div>
-        <Steps steps={4} currentStep={1} />
+        <div
+          className="hidden sm:inline sm:pb-20"
+        >
+          <Steps steps={4} currentStep={1} />
+        </div>
       </div>
     )
 }

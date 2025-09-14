@@ -56,8 +56,8 @@ const Donate: React.FC<Props> = (props: Props) => {
     return (
         <div className="max-w-xl">
             <form onSubmit={handleSubmit} className='w-full'>
-                <h2 className="text-2xl text-gray-700 font-semibold mb-2">Give <span >{props.displayName}</span> a TubeTip</h2>
-                <h4 className="text-lg font-normal text-gray-500">{props.bankConnected ? "A TubeTip is a friendly way of giving support to your hard working content creator." : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
+                <h2 className="text-lg md:text-2xl text-gray-700 font-semibold mb-2">Give <span >{props.displayName}</span> a TubeTip</h2>
+                <h4 className="text-sm md:text-lg font-normal text-gray-500">{props.bankConnected ? "A TubeTip is a friendly way of giving support to your hard working content creator." : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
 
                 {
                     props.bankConnected && (
@@ -90,7 +90,7 @@ const Donate: React.FC<Props> = (props: Props) => {
                 <button
                     type='submit'
                     disabled={!props.bankConnected || loading}
-                    className="btn primary-btn btn-xl text-[16px] font-medium border-0 rounded-lg w-[100%] mt-5"
+                    className="btn primary-btn btn-lg md:btn-xl text-sm md:text-[16px] font-medium border-0 rounded-lg w-[100%] mt-5"
                 >
                     {loading ?  <span className="loading loading-spinner"></span> : props.bankConnected ? `Tip ${props.currency}${(tipAmount*3).toString()}` : "Unavailable"}
                 </button>
@@ -117,21 +117,21 @@ const DonateAmount: React.FC<DonateAmountProps> = (props: DonateAmountProps) => 
     };
 
     return (
-    <div className="flex flex-row gap-3 items-center justify-center w-full h-[100px] bg-red-50 rounded-lg border-2 border-red-100 mt-5">
+    <div className="flex flex-row gap-1 md:gap-3 items-center justify-center w-full h-[100px] bg-red-50 rounded-lg border-2 border-red-100 mt-5 px-2">
         <Logo />
         <div className="text-xl text-gray-500 font-semibold mr-3">x</div>
 
         <DonateNumberButton tips={1} tipAmount={props.tipAmount} setAmount={props.setAmount} />
-        <DonateNumberButton tips={2} tipAmount={props.tipAmount} setAmount={props.setAmount} />
         <DonateNumberButton tips={3} tipAmount={props.tipAmount} setAmount={props.setAmount} />
-        <DonateNumberButton tips={4} tipAmount={props.tipAmount} setAmount={props.setAmount} />
+        <DonateNumberButton tips={5} tipAmount={props.tipAmount} setAmount={props.setAmount} />
+        {/* <DonateNumberButton tips={4} tipAmount={props.tipAmount} setAmount={props.setAmount} /> */}
 
         <input
         type="text"
         value={props.tipAmount || ""}
         onChange={changeAmount}
         placeholder="10"
-        className="text-md text-red-300 font-bold text-center input bg-white h-[50px] w-[50px] rounded-lg border-2 border-base-300 ml-2 focus:outline-none
+        className="text-md text-red-300 font-bold text-center input bg-white h-[40px] w-[40px] md:h-[50px] md:w-[50px] rounded-lg border-2 border-base-300 ml-2 focus:outline-none
                     [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
     </div>
@@ -147,7 +147,7 @@ interface DonateNumberButtonProps {
 const DonateNumberButton: React.FC<DonateNumberButtonProps> = (props: DonateNumberButtonProps) => {
     const selected = props.tips == props.tipAmount
     return (
-        <div onClick={() => props.setAmount(props.tips)} className={`${selected ? "primary-background" : "bg-white hover:border-error border-2"} flex items-center justify-center h-[50px] w-[50px] rounded-full border-base-300 cursor-pointer`}>
+        <div onClick={() => props.setAmount(props.tips)} className={`${selected ? "primary-background" : "bg-white hover:border-error border-2"} flex items-center justify-center h-[40px] w-[40px] md:h-[50px] md:w-[50px] rounded-full border-base-300 cursor-pointer`}>
             <p className={`text-md ${selected ? "text-white" : "text-red-300"} font-bold`}>{props.tips}</p>
         </div>
     )

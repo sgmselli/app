@@ -92,12 +92,12 @@ export default function EditProfileModal({
 
   return (
     <dialog ref={modalRef} className="modal">
-      <div className="modal-box max-w-4xl max-h-[90vh] p-12">
+      <div className="modal-box max-w-4xl max-h-[90vh] py-12 px-8 md:p-12">
         {/* Heading */}
-        <h2 className="text-3xl font-bold mb-6 text-center">
+        <h2 className="text-xl md:text-3xl font-bold mb-6 text-center">
           Edit your <span className="primary-text">TubeTip</span> profile
         </h2>
-        <h4 className="text-lg font-normal mb-10 text-center text-gray-500">
+        <h4 className="text-sm md:text-lg font-normal mb-10 text-center text-gray-500">
           Here you can edit your profile information. We advise you to keep your profile similar to your YouTube account so people know it's you.
         </h4>
 

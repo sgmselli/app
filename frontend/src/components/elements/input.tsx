@@ -113,7 +113,7 @@ export function ProfilePictureInput({
     <>
       <label
           htmlFor="profilePicture"
-          className={`w-32 h-32 rounded-xl overflow-hidden bg-base-200 border ${error ? "border-error" : "border-gray-300"} flex items-center justify-center 
+          className={`w-24 md:h-24 md:w-32 md:h-32 rounded-xl overflow-hidden bg-base-200 border ${error ? "border-error" : "border-gray-300"} flex items-center justify-center 
             cursor-pointer hover:opacity-80 transition`}
         >
           {profilePicture ? (
@@ -159,7 +159,7 @@ export function ProfileBannerInput({
     <>
       <label
         htmlFor="profileBanner"
-        className={`w-full h-[180px] rounded-xl overflow-hidden bg-base-200 flex items-center justify-center 
+        className={`w-full h-[140px] md:h-[180px] rounded-xl overflow-hidden bg-base-200 flex items-center justify-center 
           border ${error ? "border-error" : "border-gray-300"} cursor-pointer hover:opacity-80 transition`}
       >
         {profileBanner ? (

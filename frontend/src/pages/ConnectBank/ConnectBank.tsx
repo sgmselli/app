@@ -64,13 +64,18 @@ const ConnectBank: React.FC = () => {
             />
       )}
       <Navbar />
+      <div
+        className="inline sm:hidden pb-10 sm:pb-0"
+      >
+        <Steps steps={4} currentStep={3} />
+      </div>
       <div className="flex flex-1 items-start justify-center w-[100%]">
-        <form onSubmit={handleSubmit} className="w-full max-w-xl">
+        <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-xl mx-auto pb-8">
           <div className="mb-10 text-center">
-            <h2 className="text-4xl font-medium mb-4 text-gray-700">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4 text-gray-700">
               Connect your bank
             </h2>
-            <h4 className="text-lg font-normal text-gray-500">
+            <h4 className="text-md sm:text-lg font-normal mb-6 text-gray-500">
               You will need to connect your bank to accept payments from
               supporters. You will be redirected to Stripe to handle this securely.
             </h4>
@@ -157,7 +162,7 @@ const ConnectBank: React.FC = () => {
 
           <button
             type="submit"
-            className="btn btn-lg primary-btn border-0 rounded-lg w-full font-normal text-[16px] focus:outline-none"
+            className="btn btn-md sm:btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none"
             disabled={connecting}
           >
             {connecting ? (
@@ -174,7 +179,7 @@ const ConnectBank: React.FC = () => {
           </div>
           <button
             type="button"
-            className="btn btn-lg w-full rounded-lg border border-gray-300 bg-white text-gray-700 font-normal text-[16px] hover:bg-gray-100"
+            className="btn btn-md sm:btn-lg w-full rounded-lg border border-gray-300 bg-white text-gray-700 font-normal text-md hover:bg-gray-100"
             onClick={() => setLaterModal(true)}
           >
             Come back to this later
@@ -216,7 +221,11 @@ const ConnectBank: React.FC = () => {
             </dialog>
           )}
       </div>
-      <Steps steps={4} currentStep={3} />
+      <div
+        className="hidden sm:inline sm:pb-20"
+      >
+        <Steps steps={4} currentStep={3} />
+      </div>
     </div>
   );
 };
