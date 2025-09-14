@@ -12,7 +12,7 @@ export default function Label({
     additionalClassNames=""
 }: LabelProps) {
   return (
-    <label htmlFor={htmlFor} className={`${additionalClassNames} mb-2 block font-medium text-gray-700`}>
+    <label htmlFor={htmlFor} className={`${additionalClassNames} text-md mb-2 block font-medium text-gray-700`}>
         {labelName} {required && <span className="text-orange-400">*</span>}
     </label>
   );

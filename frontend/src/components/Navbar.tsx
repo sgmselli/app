@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
     }
 
     return (
-        <nav className="w-full h-[150px] flex items-center justify-between px-14">
+        <nav className="w-full h-[120px] flex items-center justify-between px-8 sm:px-12">
             <button onClick={navigateLanding} className="cursor-pointer">
                 <Logo />
             </button>

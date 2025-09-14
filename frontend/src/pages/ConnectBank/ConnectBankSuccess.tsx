@@ -16,13 +16,18 @@ const ConnectBankSuccess: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen w-full">
         <Navbar />
+        <div
+          className="inline sm:hidden pb-10 sm:pb-0"
+        >
+          <Steps steps={4} currentStep={4} />
+        </div>
         <div className="flex flex-1 items-start justify-center w-full pt-[10%]">
-          <div className="w-full max-w-3xl flex flex-col items-center text-center">
-            <h2 className="text-4xl font-medium mb-4 text-gray-700">
+          <div className="w-[90%] md:w-full md:max-w-3xl flex flex-col items-center text-center">
+            <h2 className="text-2xl md:text-4xl font-medium mb-4 text-gray-700">
               Congratulations {user ? user.username : ""}, your bank is successfully connected to your account!
             </h2>
 
-            <h4 className="text-lg font-normal mb-10 text-gray-500">
+            <h4 className="text-md md:text-lg font-normal mb-10 text-gray-500">
               Your profile can now start accepting tips. Click next to have a look at your live TubeTip profile.
             </h4>
 
@@ -31,7 +36,11 @@ const ConnectBankSuccess: React.FC = () => {
             </button>
           </div>
         </div>
-        <Steps steps={4} currentStep={4} />
+        <div
+          className="hidden sm:inline sm:pb-20"
+        >
+          <Steps steps={4} currentStep={4} />
+        </div>
       </div>
     );
 };

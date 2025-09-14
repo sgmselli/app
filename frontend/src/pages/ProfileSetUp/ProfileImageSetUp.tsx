@@ -42,15 +42,20 @@ const ProfilePictureSetUp: React.FC = () => {
     <div className="flex flex-col min-h-screen w-full">
 
       <Navbar />
-
+      <div
+        className="inline sm:hidden pb-10 sm:pb-0"
+      >
+        <Steps steps={4} currentStep={1} />
+      </div>
       <div className="flex flex-1 items-start justify-center w-full pb-5">
+        <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-2xl mx-auto pb-8">
 
-        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto pb-8">
-
-          <h2 className="text-4xl font-medium mb-4 text-center">Upload your profile pictures</h2>
-          <h4 className="text-lg font-normal mb-10 text-center text-gray-500">
-            We recommend to upload your YouTube avatar and banner so people will know it's you.
-          </h4>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4">Upload your profile pictures</h2>
+            <h4 className="text-md sm:text-lg font-normal text-gray-500">
+              We recommend to upload your YouTube avatar and banner so people will know it's you.
+            </h4>
+          </div>
 
           <div className="flex flex-col items-center justify-center form-control mb-8">
             <ProfilePictureInput
@@ -70,7 +75,7 @@ const ProfilePictureSetUp: React.FC = () => {
 
           <button
             type="submit"
-            className="btn btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none"
+            className="btn btn-md sm:btn-lg primary-btn border-0 rounded-lg w-full font-normal text-md focus:outline-none"
             disabled={loading}
           >
             {loading ? (
@@ -84,8 +89,11 @@ const ProfilePictureSetUp: React.FC = () => {
 
       </div>
 
-      <Steps steps={4} currentStep={2} />
-      
+      <div
+        className="hidden sm:inline sm:pb-20"
+      >
+        <Steps steps={4} currentStep={2} />
+      </div>
     </div>
   )
 }

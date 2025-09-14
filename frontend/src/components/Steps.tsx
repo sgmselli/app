@@ -5,7 +5,7 @@ interface StepsProps {
 
 export default function Steps({ steps, currentStep }: StepsProps) {
   return (
-    <div className="flex w-full items-center pb-20 px-6 gap-4">
+    <div className="flex w-full items-center px-6 gap-4">
       {Array.from({ length: steps }, (_, i) => {
         const stepIndex = i + 1;
         const isActive = stepIndex <= currentStep;
