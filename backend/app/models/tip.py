@@ -13,7 +13,6 @@ class Tip(Base):
     amount = Column(Integer, nullable=False)
     name = Column(String, nullable=True)
     message = Column(String, nullable=True)
-    isPrivate = Column(Boolean, nullable=False, default=False)
     stripe_session_id = Column(String, unique=True, nullable=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc).isoformat())
 

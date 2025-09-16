@@ -8,7 +8,7 @@ const ProfileFooter: React.FC = () => {
     navigate("/register");
   };
 
-  const text = "Start your own TubeTip page >"
+  // const text = "Start your own TubeTip page >"
 
   return (
     <footer className="w-full py-6 mt-12 flex flex-col items-center justify-center">

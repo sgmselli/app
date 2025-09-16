@@ -68,7 +68,7 @@ const Donate: React.FC<Props> = (props: Props) => {
                 <div className="form-control mt-5">
                     <Input
                         id="name"
-                        value={name} 
+                        value={name ?? ""} 
                         onChange={setName}
                         type="text"
                         placeholder="Your name (optional)"
@@ -80,7 +80,7 @@ const Donate: React.FC<Props> = (props: Props) => {
                 <div className="form-control mt-5">
                     <Textarea
                         id="message"
-                        value={message} 
+                        value={message ?? ""} 
                         placeholder="Write a nice message with your TubeTip (optional)"
                         onChange={setMessage}
                         disabled={!props.bankConnected}

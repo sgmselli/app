@@ -9,10 +9,10 @@ interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (formData: {
-    displayName: string;
-    bio: string;
-    profilePictureUrl: string;
-    profileBannerUrl: string;
+    displayName: string | null;
+    bio: string | null;
+    profilePictureUrl: string | null;
+    profileBannerUrl: string | null;
   }) => void;
   initialDisplayName: string | null;
   initialBio: string | null;
@@ -64,7 +64,7 @@ export default function EditProfileModal({
   const buildRequestData = () => {
     return {display_name: displayName, bio: bio, profile_banner: profileBanner, profile_picture: profilePicture}
   }
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!hasChanges) return;
@@ -131,7 +131,7 @@ export default function EditProfileModal({
             <Input
               id="displayName"
               type="text"
-              value={displayName}
+              value={displayName ?? ""}
               placeholder="Name"
               onChange={setDisplayName}
               required={true}
@@ -149,7 +149,7 @@ export default function EditProfileModal({
             </label>
             <Textarea
               id="bio"
-              value={bio}
+              value={bio ?? ""}
               placeholder="Write about your Youtube channel, how it helps its subscribers and how your contribution can help..."
               onChange={setBio}
               required={true}

@@ -12,4 +12,6 @@ RUN chmod +x run.sh
 
 EXPOSE 8000
 
+USER 1000
+
 CMD ["./run.sh"]

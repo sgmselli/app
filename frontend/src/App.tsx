@@ -5,7 +5,6 @@ import PrivateRoute from "./components/protectedRoutes/protectedRoutes";
 import UnauthorisedRoute from "./components/protectedRoutes/unauthorisedRoute";
 import ProfileSetupRoute from "./components/protectedRoutes/ProfileSetUpRoute";
 import ConnectBankRoute from "./components/protectedRoutes/ConnectBankRoute";
-import Layout from "./components/Layout";
 
 import Landing from "./pages/Landing/Landing";
 import Login from "./pages/Auth/Login";
@@ -15,8 +14,6 @@ import ConnectBankSuccess from "./pages/ConnectBank/ConnectBankSuccess";
 import ProfileSetUp from "./pages/ProfileSetUp/ProfileSetUp";
 import ProfilePictureSetUp from "./pages/ProfileSetUp/ProfileImageSetUp";
 import Profile from "./pages/Profile/Profile";
-import CheckoutSuccess from "./pages/Checkout/CheckoutSuccess";
-import CheckoutFailure from "./pages/Checkout/CheckoutFailure";
 import NotFound from "./pages/NotFound";
 
 
@@ -46,8 +43,6 @@ export default function App() {
               </Route>
 
               <Route path="/:username" element={<Profile />} />
-              <Route path="/bank/checkout/success" element={<CheckoutSuccess />} />
-              <Route path="/bank/checkout/failure" element={<CheckoutFailure />} />
 
               {/* 404 page */}
               <Route path="*" element={<NotFound />} />
