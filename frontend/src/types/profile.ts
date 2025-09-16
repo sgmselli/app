@@ -28,7 +28,7 @@ export interface GetCurrentUserResponse {
   email: string;
   has_profile: boolean;
   is_bank_connected: boolean;
-  profile_picture_url?: string | null
+  profile_picture_url?: string
 }
 
 export interface GetBankStatusResponse {
@@ -56,8 +56,8 @@ export interface GetProfileResponse {
 }
 
 export interface UpdateProfileRequest {
-  display_name?: string;
-  bio?: string;
+  display_name?: string | null;
+  bio?: string | null;
   profile_picture?: File | null
   profile_banner?: File | null
 }

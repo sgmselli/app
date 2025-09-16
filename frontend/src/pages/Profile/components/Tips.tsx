@@ -41,7 +41,7 @@ const Tip: React.FC<TipProps> = (props: TipProps) => {
 
     return (
         <div className="mb-6">
-            <p><span className='font-semibold'>{props.name ? props.name : "Someone"}</span> TubeTipped £{parseInt(props.amount)/100} 💸</p>
+            <p><span className='font-semibold'>{props.name ? props.name : "Someone"}</span> TubeTipped £{props.amount/100} 💸</p>
             { props.message &&
                 <div className="bg-red-50 py-4 px-6 w-fit rounded-lg mt-2">
                     <p className="text-sm text-gray-700 font-normal">{props.message}</p>

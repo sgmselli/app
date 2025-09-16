@@ -86,7 +86,7 @@ const Profile: React.FC = () => {
         handleFetch();
     }, [username]);
 
-    const handleSave = (formData: { displayName?: string; bio?: string; profilePictureUrl?: string; profileBannerUrl?: string }) => {
+    const handleSave = (formData: { displayName?: string | null; bio?: string | null; profilePictureUrl?: string | null; profileBannerUrl?: string | null }) => {
         if (formData.displayName) setDisplayName(formData.displayName);
         if (formData.bio) setBio(formData.bio);
         if (formData.profilePictureUrl) setProfilePictureUrl(formData.profilePictureUrl);

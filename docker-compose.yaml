@@ -40,8 +40,8 @@ services:
 
   celery_worker:
     build: ./backend
-    command: celery -A app.celery_app worker --loglevel=info
-    env_file: .env
+    command: celery -A app.celery.celery_task_queue worker --loglevel=info
+    env_file: ./backend/.env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379

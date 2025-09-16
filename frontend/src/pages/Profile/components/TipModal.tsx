@@ -6,7 +6,7 @@ import Tips from "./Tips";
 interface TipsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  id: number;
+  id: number | null;
 }
 
 export default function TipsModal({ isOpen, onClose, id }: TipsModalProps) {
@@ -25,6 +25,8 @@ export default function TipsModal({ isOpen, onClose, id }: TipsModalProps) {
   }, [isOpen]);
 
   const fetchTips = async (pageNum: number) => {
+    if (id === null) return;
+
     const { tips } = await getTips({creator_profile_id: id, limit: 15, offset: pageNum * 8})
     
     if (tips.length < 15) setHasMore(false);

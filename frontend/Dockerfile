@@ -24,7 +24,7 @@ COPY ./nginx/development/default.conf /etc/nginx/conf.d/development/default.conf
 COPY ./nginx/production/default.conf /etc/nginx/conf.d/production/default.conf
 
 # Copy the build output from React
-COPY --from=build ./frontend/build /usr/share/nginx/html
+COPY --from=build ./frontend/dist /usr/share/nginx/html
 
 COPY run.sh /run.sh
 RUN chmod +x /run.sh

@@ -19,10 +19,10 @@ interface ProfileNavbarProps {
   logoutUser: () => void;
   loginUser: () => void;
   onSave: (formData: {
-    displayName: string;
-    bio: string;
-    profilePictureUrl: string;
-    profileBannerUrl: string;
+    displayName: string | null;
+    bio: string | null;
+    profilePictureUrl: string | null;
+    profileBannerUrl: string | null;
   }) => void
 }
 

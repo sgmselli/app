@@ -1,7 +1,7 @@
 interface InputProps {
   id: string;
   type?: string;
-  value: string | null;
+  value: string;
   placeholder?: string;
   required?: boolean;
   onChange: (text: string) => void;
@@ -13,7 +13,7 @@ interface InputProps {
 interface InputLeftIconProps {
   id?: string | undefined;
   type?: string;
-  value: string | null;
+  value: string;
   placeholder?: string;
   icon: string
   required?: boolean;

@@ -1,6 +1,6 @@
 interface TextareaProps {
   id: string;
-  value: string | null;
+  value: string;
   placeholder: string;
   required?: boolean;
   onChange: (text: string) => void;
