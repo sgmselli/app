@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../contexts/AuthContext";
 import Navbar from "../../components/Navbar";
 import Steps from "../../components/Steps";
+import MotionDiv from "../../components/divAnimation";
 
 const ConnectBankSuccess: React.FC = () => {
 
@@ -22,7 +24,9 @@ const ConnectBankSuccess: React.FC = () => {
           <Steps steps={4} currentStep={4} />
         </div>
         <div className="flex flex-1 items-start justify-center w-full pt-[10%]">
-          <div className="w-[90%] md:w-full md:max-w-3xl flex flex-col items-center text-center">
+          <MotionDiv 
+            className="w-[90%] md:w-full md:max-w-3xl flex flex-col items-center text-center"
+          >
             <h2 className="text-2xl md:text-4xl font-medium mb-4 text-gray-700">
               Congratulations {user ? user.username : ""}, your bank is successfully connected to your account!
             </h2>
@@ -34,7 +38,7 @@ const ConnectBankSuccess: React.FC = () => {
             <button onClick={handleNavigate} className="btn btn-lg primary-btn border-0 w-[200px] rounded-lg font-normal text-md focus:outline-none">
               Next
             </button>
-          </div>
+          </MotionDiv>
         </div>
         <div
           className="hidden sm:inline sm:pb-20"

@@ -6,7 +6,7 @@ export default function PrivateRoute() {
   const { user, loadingUser } = useAuth();
 
   if (loadingUser) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen"><span className="loading primary-text loading-xl"></span></div>;
   }
 
   if (!user) {

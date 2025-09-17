@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import AuthNavbar from "./components/AuthNavbar";
 import Input from "../../components/elements/input";
+import MotionDiv from "../../components/divAnimation";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string | string>("");
@@ -40,7 +41,7 @@ const Login: React.FC = () => {
       <AuthNavbar
         route="register"
       />
-      <div className="flex flex-1 items-center justify-center pb-40">
+      <MotionDiv className="flex flex-1 items-center justify-center pb-40">
         <form
           onSubmit={handleSubmit}
           className="w-[90%] sm:w-full sm:max-w-md md:max-w-lg bg-white rounded-xl"
@@ -69,7 +70,7 @@ const Login: React.FC = () => {
             {loading ? <span className="loading loading-spinner"></span> : "Continue"}
           </button>
         </form>
-      </div>
+      </MotionDiv>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { updateCreatorProfilePictures } from '../../api/profile';
 import Navbar from '../../components/Navbar';
 import Steps from '../../components/Steps';
 import { ProfileBannerInput, ProfilePictureInput } from '../../components/elements/input';
+import MotionDiv from '../../components/divAnimation';
 
 const ProfilePictureSetUp: React.FC = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -47,7 +48,7 @@ const ProfilePictureSetUp: React.FC = () => {
       >
         <Steps steps={4} currentStep={1} />
       </div>
-      <div className="flex flex-1 items-start justify-center w-full pb-5">
+      <MotionDiv className="flex flex-1 items-start justify-center w-full pb-5">
         <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-2xl mx-auto pb-8">
 
           <div className="text-center mb-10">
@@ -87,7 +88,7 @@ const ProfilePictureSetUp: React.FC = () => {
 
         </form>
 
-      </div>
+      </MotionDiv>
 
       <div
         className="hidden sm:inline sm:pb-20"

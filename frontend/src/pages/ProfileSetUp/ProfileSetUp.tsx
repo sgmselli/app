@@ -7,6 +7,7 @@ import Steps from '../../components/Steps';
 import Textarea from '../../components/elements/textarea';
 import Label from '../../components/elements/label';
 import Input, { InputLeftIcon } from '../../components/elements/input';
+import MotionDiv from '../../components/divAnimation';
 
 const ProfileSetUp: React.FC = () => {
     const [displayName, setDisplayName] = useState<string>("");
@@ -49,7 +50,7 @@ const ProfileSetUp: React.FC = () => {
         >
           <Steps steps={4} currentStep={1} />
         </div>
-        <div className="flex flex-1 items-start justify-center w-full pb-5">
+        <MotionDiv className="flex flex-1 items-start justify-center w-full pb-5">
           <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-xl mx-auto pb-8">
             <div className="mb-10 text-center mb-10">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4">Complete your page</h2>
@@ -126,7 +127,7 @@ const ProfileSetUp: React.FC = () => {
               )}
             </button>
           </form>
-        </div>
+        </MotionDiv>
         <div
           className="hidden sm:inline sm:pb-20"
         >
