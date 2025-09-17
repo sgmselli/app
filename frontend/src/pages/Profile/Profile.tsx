@@ -11,6 +11,7 @@ import ProfileFooter from './components/ProfileFooter';
 import ProfileNavbar from './components/ProfileNavbar';
 import TipsModal from './components/TipModal';
 import type { Tip } from '../../types/tip';
+import MotionDiv from '../../components/divAnimation';
 
 interface SucessCheckoutModalProps {
     setIsThanksModalOpen: (isOpen: boolean) => void;
@@ -107,7 +108,7 @@ const Profile: React.FC = () => {
     };
 
     if (loading || loadingUser) {
-        return <div><h2>Loading...</h2></div>;
+        return <div className="flex items-center justify-center h-screen"><span className="loading primary-text loading-xl"></span></div>;
     }
 
     const isLoggedInUser = user?.username === username;
@@ -144,7 +145,7 @@ const Profile: React.FC = () => {
 
   {!error ? (
     <div className="flex flex-col items-center w-full">
-      <div className="w-full max-w-[1100px] md:px-6">
+      <div className="flex-1 w-full max-w-[1100px] md:px-6">
         {/* Banner */}
         {profileBannerUrl && (
           <div className="relative">
@@ -192,7 +193,9 @@ const Profile: React.FC = () => {
             </div>
 
             {/* About Section */}
-            <div className="flex flex-col shadow-xl rounded-xl bg-white p-6">
+            <MotionDiv
+                className="flex flex-col shadow-xl rounded-xl bg-white p-6"
+            >
               <h2 className="text-lg font-medium mb-2">About {displayName}</h2>
 
               <a
@@ -206,10 +209,12 @@ const Profile: React.FC = () => {
               </a>
 
               <p className="text-md mt-2">{bio}</p>
-            </div>
+            </MotionDiv >
 
             {/* Tips Section */}
-            <div className="flex flex-col shadow-xl rounded-xl bg-white p-6">
+            <MotionDiv
+                className="flex flex-col shadow-xl rounded-xl bg-white p-6"
+            >
               <h2 className="text-xl font-medium">Recent tips</h2>
               {numberOfTips === 0 ? (
                 <div className="p-10 rounded-lg w-full flex items-center justify-center h-[150px] mt-4 bg-red-50 border-2 border-red-100">
@@ -238,22 +243,23 @@ const Profile: React.FC = () => {
                   )}
                 </>
               )}
-            </div>
+            </MotionDiv>
           </div>
 
           {/* Right column (Donate) for desktop */}
-          <div className="p-10 rounded-xl bg-white shadow-xl hidden md:block order-1 md:order-2">
+          <MotionDiv
+            className="p-10 rounded-xl bg-white shadow-xl hidden md:block order-1 md:order-2"
+        >
             <Donate
               displayName={displayName || ""}
               username={username || ""}
               currency={currency || ""}
               bankConnected={bankConnected}
             />
-          </div>
+          </MotionDiv>
         </div>
       </div>
 
-      <ProfileFooter />
     </div>
   ) : (
     <div className="flex justify-center items-center text-center pt-20 px-4">
@@ -264,6 +270,8 @@ const Profile: React.FC = () => {
         </h2>
     </div>
   )}
+      <ProfileFooter isLoggedInUser={isLoggedInUser} />
+
 </div>
     );
 };

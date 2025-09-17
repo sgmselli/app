@@ -45,14 +45,14 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <nav className="w-full h-[80px] md:h-[150px] flex items-center justify-between px-4 md:px-14 md:pt-10 md:pb-6">
+    <nav className="w-full h-[80px] lg:h-[150px] flex items-center justify-between px-4 lg:px-14 lg:pt-10 lg:pb-6">
       {/* Left side logo */}
-      <div className="flex items-center md:hidden">
+      <div className="flex items-center lg:hidden">
         <Logo />
       </div>
 
       {/* Mobile Hamburger Menu */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {isAuthenticated() ? (
           <div className="dropdown dropdown-end">
             <button tabIndex={0} className="btn btn-ghost btn-circle">
@@ -88,7 +88,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden md:flex flex-row gap-6 items-center">
+      <div className="hidden lg:flex flex-row gap-6 items-center">
         {!!profilePictureUrl ? (
           <img
             src={profilePictureUrl}
@@ -100,7 +100,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
         <div className="flex flex-col">
           <h1 className="text-xl font-semibold">{displayName}</h1>
           {bankConnected && (
-            <h3 className="text-md text-gray-500 font-light">
+            <h3 className="text-lg text-gray-500 font-light">
               {numberOfTips}{" "}
               {numberOfTips === undefined || numberOfTips !== 1 ? "tips" : "tip"}
             </h3>
@@ -118,7 +118,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
         onSave={onSave}
       />
 
-      <div className="hidden md:inline">
+      <div className="hidden lg:inline">
         {isAuthenticated() ? (
           <div className="flex flex-row items-center justify-center gap-4">
             <CopyUrl username={username} />
@@ -231,7 +231,7 @@ function CopyUrl({
 
   return (
     <>
-      <div className={`hidden md:flex items-center gap-0 cursor-pointer`} onClick={handleCopy}>
+      <div className={`hidden lg:flex items-center gap-0 cursor-pointer`} onClick={handleCopy}>
         <div
           aria-label="Profile URL"
           className="flex justify-center items-center text-sm bg-base-200 rounded-l-lg rounded-r-none border border-gray-200 
@@ -260,7 +260,7 @@ function CopyUrl({
       </div>
       <div 
         onClick={handleCopy}
-        className="md:hidden"
+        className="lg:hidden"
       >
         <button
           type="button"

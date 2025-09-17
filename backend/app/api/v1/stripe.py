@@ -56,8 +56,8 @@ def connect_bank_account(
     )
     account_link = stripe_functions.create_stripe_account_link(
         connected_account_id=account_id,
-        return_url=settings.stripe_return_url,
-        refresh_url=settings.stripe_refresh_url,
+        return_url=settings.stripe_connect_return_url,
+        refresh_url=settings.stripe_connect_refresh_url,
     )
     profile.stripe_account_id = account_id
     profile.country = payload.country

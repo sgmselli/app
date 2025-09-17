@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import { Country } from "../../types/country"; 
 import { getConnectBankUrl } from "../../api/payment"; 
 import type { ConnectBankRequest, ConnectBankResponse } from "../../types/payment";
@@ -6,6 +7,7 @@ import Navbar from "../../components/Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Steps from "../../components/Steps";
+import MotionDiv from "../../components/divAnimation";
 
 interface ErrorCheckoutModalProps {
     setIsErrorModalOpen: (isOpen: boolean) => void;
@@ -69,8 +71,10 @@ const ConnectBank: React.FC = () => {
       >
         <Steps steps={4} currentStep={3} />
       </div>
-      <div className="flex flex-1 items-start justify-center w-[100%]">
-        <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-xl mx-auto pb-8">
+      <MotionDiv
+        className="flex flex-1 items-start justify-center w-[100%]"
+      >
+        <form onSubmit={handleSubmit} className="w-[90%] sm:w-full sm:max-w-xl mx-auto pb-8 md:pt-15">
           <div className="mb-10 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-4 text-gray-700">
               Connect your bank
@@ -220,7 +224,7 @@ const ConnectBank: React.FC = () => {
               </form>
             </dialog>
           )}
-      </div>
+      </MotionDiv>
       <div
         className="hidden sm:inline sm:pb-20"
       >

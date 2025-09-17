@@ -5,6 +5,7 @@ import { register } from "../../api/auth";
 import { useAuth } from "../../contexts/AuthContext";
 import AuthNavbar from "./components/AuthNavbar";
 import Input, { InputLeftIcon } from "../../components/elements/input";
+import MotionDiv from "../../components/divAnimation";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -55,7 +56,7 @@ const Register: React.FC = () => {
         route="login"
       />
 
-      <div className="flex flex-1 items-center justify-center pb-40">
+      <MotionDiv className="flex flex-1 items-center justify-center pb-40">
         <form 
           onSubmit={handleSubmit} 
           className="w-[90%] sm:w-full sm:max-w-md md:max-w-lg bg-white rounded-xl"
@@ -121,8 +122,8 @@ const Register: React.FC = () => {
               )
             }
           </button>
-      </form>
-      </div>
+        </form>
+      </MotionDiv>
     </div>
   );
 };
