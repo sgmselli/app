@@ -17,7 +17,6 @@ export const Country = {
   Greece: "🇬🇷 Greece",
   HongKong: "🇭🇰 Hong Kong",
   Hungary: "🇭🇺 Hungary",
-  India: "🇮🇳 India",
   Indonesia: "🇮🇩 Indonesia",
   Ireland: "🇮🇪 Ireland",
   Italy: "🇮🇹 Italy",

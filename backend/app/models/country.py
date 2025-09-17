@@ -19,7 +19,6 @@ class Country(enum.Enum):
     Greece = "Greece"
     HongKong = "HongKong"
     Hungary = "Hungary"
-    India = "India"
     Indonesia = "Indonesia"
     Ireland = "Ireland"
     Italy = "Italy"

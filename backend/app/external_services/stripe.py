@@ -33,7 +33,6 @@ STRIPE_COUNTRY_DATA: dict[Country, StripeCountryDetails] = {
     Country.Greece: StripeCountryDetails("GR", "eur"),
     Country.HongKong: StripeCountryDetails("HK", "hkd"),
     Country.Hungary: StripeCountryDetails("HU", "huf"),
-    Country.India: StripeCountryDetails("IN", "inr"),
     Country.Indonesia: StripeCountryDetails("ID", "idr"),
     Country.Ireland: StripeCountryDetails("IE", "eur"),
     Country.Italy: StripeCountryDetails("IT", "eur"),

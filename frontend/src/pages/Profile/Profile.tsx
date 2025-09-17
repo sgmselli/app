@@ -179,7 +179,7 @@ const Profile: React.FC = () => {
             )}
 
         {/* Content layout */}
-        <div className="flex flex-col md:flex-row justify-center items-center md:items-start md:justify-between gap-6 md:gap-12 mt-8 md:mt-[60px]">
+        <div className="flex flex-col md:flex-row justify-center items-center md:items-start md:justify-between gap-6 md:gap-12 mt-8 md:mt-[60px] pb-10">
           {/* Left column (About + Tips) */}
           <div className="flex flex-col justify-center gap-6 w-[90%] md:w-[500px] order-2 md:order-1">
             {/* Donate Section (mobile first, on top) */}
@@ -270,7 +270,7 @@ const Profile: React.FC = () => {
         </h2>
     </div>
   )}
-      <ProfileFooter isLoggedInUser={isLoggedInUser} />
+      <ProfileFooter isAuthenticated={isAuthenticated} />
 
 </div>
     );

@@ -26,7 +26,8 @@ class BaseAppSettings(BaseSettings):
     refresh_token_expire_days: int = 30
     stripe_secret_key: Optional[str] = None
     stripe_connect_return_url: Optional[str] = None
-    stripe_connect_refresh_url: Optional[str] = None
+    stripe_connect_failed_url: Optional[str] = None
+    stripe_connect_success_url: Optional[str] = None
     stripe_checkout_return_url: Optional[str] = None
     stripe_checkout_refresh_url: Optional[str] = None
     application_fee_percentage: float = 0.15

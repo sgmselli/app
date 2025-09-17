@@ -110,9 +110,6 @@ const ProfileSetUp: React.FC = () => {
                 required={true}
                 error={errors.bio}
               />
-              {errors.bio && (
-                <p className="mt-1 text-sm text-error">{errors.bio}</p>
-              )}
             </div>
 
             <button

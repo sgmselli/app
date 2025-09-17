@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 import stripe
 
@@ -57,13 +58,20 @@ def connect_bank_account(
     account_link = stripe_functions.create_stripe_account_link(
         connected_account_id=account_id,
         return_url=settings.stripe_connect_return_url,
-        refresh_url=settings.stripe_connect_refresh_url,
+        refresh_url=settings.stripe_connect_failed_url,
     )
     profile.stripe_account_id = account_id
     profile.country = payload.country
     db.commit()
     db.refresh(profile)
     return {"url": account_link}
+
+@router.get('/connect/callback')
+async def connect_bank_account_callback(current_user: Creator = Depends(get_current_user)):
+    if current_user.is_bank_connected:
+        return RedirectResponse(url=settings.stripe_connect_success_url)
+    else:
+        return RedirectResponse(url=settings.stripe_connect_failed_url)
 
 @router.post("/checkout")
 async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session = Depends(get_db)):
