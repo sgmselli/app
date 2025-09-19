@@ -1,0 +1,72 @@
+/* 1. Remove all default margins, paddings, and borders */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 2. Improve text rendering */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+/* 3. Set a base line-height and font family */
+body {
+  line-height: 1.5;
+  font-family: sans-serif;
+}
+
+/* 4. Remove default link styles */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 5. Remove list styles */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 6. Make images behave consistently */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Remove default button styles */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+/* 8. Ensure forms don't overflow */
+input,
+textarea {
+  max-width: 100%;
+}
+
+/* 9. Remove animations/transitions for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

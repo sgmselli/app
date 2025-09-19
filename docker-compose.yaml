@@ -27,16 +27,32 @@ services:
     container_name: db
     image: postgres
     volumes:
-      - db_data:/var/lib/postgres
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     expose:
       - "5432"
     environment:
-      - POSTGRES_DB=guitardb
+      - POSTGRES_DB=tiptubedb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=db
+
+  celery_worker:
+    build: ./backend
+    command: celery -A app.celery.celery_task_queue worker --loglevel=info
+    env_file: ./backend/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   db_data:

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default;
+}
+
+.primary-btn {
+  background-color: #FF0033;
+  color: white;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.primary-btn:hover {
+  background-color: #CC022A;
+}
+
+.primary-btn:disabled,
+.primary-btn[disabled] {
+  background-color: #FFB3C1; 
+  color: #FFFFFF; 
+  opacity: 0.7;
+}
+
+.primary-text {
+    color: #FF0033;
+}
+
+.primary-background {
+  background-color: #FF0033;
+}
+
+.primary-border {
+  border-color: #FF0033;
+}

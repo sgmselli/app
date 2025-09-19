@@ -66,7 +66,60 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-# Attach AWS-managed policy to the role 
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecsTaskRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "ecs_task_permissions" {
+  name = "ecs-task-permissions"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "arn:aws:s3:::tubetip-dev/*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = ["s3:ListBucket"],
+        Resource = "arn:aws:s3:::tubetip-dev"
+      },
+
+      {
+        Effect   = "Allow",
+        Action   = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        Resource = [
+          aws_secretsmanager_secret.stripe_api_key.arn,
+          aws_secretsmanager_secret.stripe_webhook_secret.arn,
+          aws_secretsmanager_secret.send_grid_api_key.arn
+        ]
+      }
+    ]
+  })
+}
+
+# Attach AWS-managed policy to the role
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = var.ecs_task_execution_policy_arn
@@ -104,8 +157,8 @@ resource "aws_ecs_task_definition" "frontend" {
       ]
       environment = [
         {
-          name  = "ENVIRONMENT"
-          value = "production"
+          name  = "VITE_API_URL"
+          value = "https://www.tubetip.co/api/v1"
         }
       ],
       logConfiguration = {
@@ -128,6 +181,7 @@ resource "aws_ecs_task_definition" "backend" {
   cpu                      = "256"
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -145,11 +199,29 @@ resource "aws_ecs_task_definition" "backend" {
           name  = "APP_ENV"
           value = "PRODUCTION"
         },
-        {
-          name  = "DATABASE_URL"
-          value = "postgresql://postgres:password@db:5432/db"
-        }
       ],
+      secrets = [
+        {
+          name      = "STRIPE_API_KEY"
+          valueFrom = aws_secretsmanager_secret.stripe_api_key.arn
+        },
+        {
+          name      = "STRIPE_WEBHOOK_SECRET"
+          valueFrom = aws_secretsmanager_secret.stripe_webhook_secret.arn
+        },
+        {
+          name      = "SENDGRID_API_KEY"
+          valueFrom = aws_secretsmanager_secret.send_grid_api_key.arn
+        },
+        {
+          name      = "ACCESS_SECRET_KEY"
+          valueFrom = aws_secretsmanager_secret.access_secret_key.arn
+        },
+        {
+          name      = "REFRESH_SECRET_KEY"
+          valueFrom = aws_secretsmanager_secret.refresh_secret_key.arn
+        }
+      ]
       logConfiguration = {
         logDriver = "awslogs",
         options = {

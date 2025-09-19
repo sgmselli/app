@@ -1,0 +1,21 @@
+{
+  "name": "TubeTip",
+  "short_name": "TubeTip",
+  "description": "Support your favorite YouTubers with quick and secure tips.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff0000",
+  "icons": [
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
