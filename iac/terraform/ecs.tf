@@ -5,22 +5,20 @@ data "aws_subnets" "default" {
   }
 }
 
-# Create ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "app-cluster"
 }
 
-# Security group for ECS tasks 
 resource "aws_security_group" "frontend_sg" {
   name        = "ecs-frontend-sg"
   description = "Allow HTTP to frontend"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
   egress {
@@ -183,7 +181,6 @@ resource "aws_cloudwatch_log_group" "ecs_backend" {
   retention_in_days = 1
 }
 
-# ECS Task Definition (Frontend)
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "frontend-task"
   requires_compatibilities = ["FARGATE"]
@@ -221,7 +218,6 @@ resource "aws_ecs_task_definition" "frontend" {
   ])
 }
 
-# ECS Task Definition (Backend)
 resource "aws_ecs_task_definition" "backend" {
   family                   = "backend-task"
   requires_compatibilities = ["FARGATE"]
@@ -342,7 +338,6 @@ resource "aws_service_discovery_private_dns_namespace" "namespace" {
   vpc         = data.aws_vpc.default.id
 }
 
-# ECS Service (Frontend)
 resource "aws_ecs_service" "frontend" {
   name            = "frontend-service"
   cluster         = aws_ecs_cluster.main.id
@@ -354,6 +349,12 @@ resource "aws_ecs_service" "frontend" {
     subnets          = data.aws_subnets.default.ids
     assign_public_ip = true
     security_groups  = [aws_security_group.frontend_sg.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.frontend.arn
+    container_name   = "frontend"
+    container_port   = 80
   }
 
   depends_on = [aws_ecs_cluster.main, aws_ecs_service.backend]
@@ -373,7 +374,6 @@ resource "aws_service_discovery_service" "backend_discovery_service" {
   }
 }
 
-# ECS Service (Backend)
 resource "aws_ecs_service" "backend" {
   name            = "backend-service"
   cluster         = aws_ecs_cluster.main.id
@@ -394,7 +394,6 @@ resource "aws_ecs_service" "backend" {
   depends_on = [aws_ecs_cluster.main]
 }
 
-# ECS Service (Worker)
 resource "aws_ecs_service" "worker" {
   name            = "worker-service"
   cluster         = aws_ecs_cluster.main.id
@@ -425,7 +424,6 @@ resource "aws_service_discovery_service" "redis" {
   }
 }
 
-# ECS Service (Worker)
 resource "aws_ecs_service" "redis" {
   name            = "redis-service"
   cluster         = aws_ecs_cluster.main.id

@@ -39,8 +39,8 @@ class BaseAppSettings(BaseSettings):
     refresh_token_expire_days: int = 30
     jwt_encryption_algorithm: str = "HS256"
     from_email: str = "noreply@tubetip.co"
-    aws_region = "eu-west-2"
-    bucket_name = "tubetip-dev"
-    cloud_front_url = "d357a07t61on3p.cloudfront.net"
+    aws_region: str = "eu-west-2"
+    bucket_name: str = "tubetip-dev"
+    cloud_front_url: str = "d357a07t61on3p.cloudfront.net"
 
 
