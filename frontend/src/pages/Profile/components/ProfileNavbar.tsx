@@ -119,28 +119,32 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
       />
 
       <div className="hidden lg:inline">
-        {isAuthenticated() ? (
+        
           <div className="flex flex-row items-center justify-center gap-4">
             <CopyUrl username={username} />
-            {isLoggedInUser && (
-              <button
-                className="btn btn-neutral text-white rounded-full border-0 btn-md"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Edit Profile
-              </button>
-            )}
-            <UserMenu
-              myProfilePictureUrl={myProfilePictureUrl}
-              navigateMyProfile={navigateMyProfile}
-              logoutUser={logoutUser}
-            />
-          </div>
-        ) : (
+            {isAuthenticated() ? 
+              isLoggedInUser && (
+                <>
+                <button
+                  className="btn btn-neutral text-white rounded-full border-0 btn-md"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Edit Profile
+                </button>
+              
+              <UserMenu
+                myProfilePictureUrl={myProfilePictureUrl}
+                navigateMyProfile={navigateMyProfile}
+                logoutUser={logoutUser}
+              />
+                </>
+              ) : (
           <button className="cursor-pointer" onClick={loginUser}>
             Login
           </button>
         )}
+          </div>
+        
       </div>
     </nav>
   );

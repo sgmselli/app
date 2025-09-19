@@ -9,6 +9,7 @@ interface Props {
     username: string;
     displayName: string
     currency: string
+    tubeTipValue: number
     bankConnected: boolean | null
 }
 
@@ -27,7 +28,7 @@ const Donate: React.FC<Props> = (props: Props) => {
         try {
             const response = await getCheckoutUrl({
                 username: props.username, 
-                payment_amount: calculateTotalTip(tipAmount),
+                number_of_tube_tips: tipAmount,
                 name: name,
                 message: message
             });
@@ -45,10 +46,6 @@ const Donate: React.FC<Props> = (props: Props) => {
         }
     }
 
-    const calculateTotalTip = (tipAmount: number) => {
-        return tipAmount * 100 * 3
-    }
-
     const setAmount = (tipAmount: number) => {
         setTipAmount(tipAmount);
     }
@@ -57,7 +54,7 @@ const Donate: React.FC<Props> = (props: Props) => {
         <div className="max-w-xl">
             <form onSubmit={handleSubmit} className='w-full'>
                 <h2 className="text-lg md:text-2xl text-gray-700 font-semibold mb-2">Give <span >{props.displayName}</span> a TubeTip</h2>
-                <h4 className="text-sm md:text-lg font-normal text-gray-500">{props.bankConnected ? "A TubeTip is a friendly way of giving support to your hard working content creator." : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
+                <h4 className="text-sm md:text-lg font-normal text-gray-500">{props.bankConnected ? `A TubeTip is a friendly way of giving support to your hard working content creator. 1 TubeTip = ${props.currency}${props.tubeTipValue}.` : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
 
                 {
                     props.bankConnected && (
@@ -92,7 +89,7 @@ const Donate: React.FC<Props> = (props: Props) => {
                     disabled={!props.bankConnected || loading}
                     className="btn primary-btn btn-lg md:btn-xl text-sm md:text-[16px] font-medium border-0 rounded-lg w-[100%] mt-5"
                 >
-                    {loading ?  <span className="loading loading-spinner"></span> : props.bankConnected ? `Tip ${props.currency}${(tipAmount*3).toString()}` : "Unavailable"}
+                    {loading ?  <span className="loading loading-spinner"></span> : props.bankConnected ? `Tip ${props.currency}${(tipAmount*props.tubeTipValue).toString()}` : "Unavailable"}
                 </button>
             </form>
         </div>

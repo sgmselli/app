@@ -23,7 +23,7 @@ class BankConnectPayload(BaseModel):
 
 class StripeCheckoutPayload(BaseModel):
     username: str
-    payment_amount: float
+    number_of_tube_tips: int
     name: Optional[str] = None
     message: Optional[str] = None
 
@@ -39,14 +39,14 @@ class StripeCheckoutPayload(BaseModel):
             raise ValueError("Username can only contain letters, numbers, periods, underscores, and hyphens")
         return v
 
-    @field_validator("payment_amount")
+    @field_validator("number_of_tube_tips")
     def validate_payment_amount(cls, v: float) -> float:
-        min_amount = 1 * 100 * 3  # 300
-        max_amount = 99999 * 100 * 3  # 29,997,000
+        min_amount = 1
+        max_amount = 99999
         if v < min_amount:
-            raise ValueError(f"Payment amount must be at least {min_amount / 100:.2f}")
+            raise ValueError(f"Number of tube tips must be at least {min_amount}")
         if v > max_amount:
-            raise ValueError(f"Payment amount must not exceed {max_amount / 100:.2f}")
+            raise ValueError(f"Number of tube tips must not exceed {max_amount}")
         return v
 
     @field_validator("name")

@@ -34,6 +34,7 @@ const Profile: React.FC = () => {
     const [profileBannerUrl, setProfileBannerUrl] = useState<string | null>(null);
     const [youtubeChannelName, setYoutubeChannelName] = useState<string | null>(null);
     const [currency, setCurrency] = useState<string | null>(null);
+    const [tubeTipValue, setTubeTipValue] = useState<number | null>(null);
     const [tips, setTips] = useState<Tip[]>([]);
     const [numberOfTips, setNumberOfTips] = useState<number>(0);
     const [bankConnected, setBankConnected] = useState<boolean | null>(null);
@@ -70,6 +71,7 @@ const Profile: React.FC = () => {
                     setDisplayName(profile.display_name);
                     setBio(profile.bio);
                     setCurrency(getCurrencySymbol(profile.currency));
+                    setTubeTipValue(profile.tube_tip_value)
                     setTips(profile.tips);
                     setNumberOfTips(profile.number_of_tips);
                     setYoutubeChannelName(profile.youtube_channel_name);
@@ -148,7 +150,7 @@ const Profile: React.FC = () => {
       <div className="flex-1 w-full max-w-[1100px] md:px-6">
         {/* Banner */}
         {profileBannerUrl && (
-          <div className="relative">
+          <MotionDiv className="relative">
             <img
               src={profileBannerUrl}
               alt="YouTube Banner"
@@ -158,12 +160,12 @@ const Profile: React.FC = () => {
 
             {/* Profile picture over banner (mobile/tablet) */}
             
-          </div>
+          </MotionDiv>
 
         )}
 
         {profilePictureUrl && (
-                <div className={`flex flex-col items-center gap-3 ${profileBannerUrl && "-mt-15"} px-4 md:hidden`}>
+                <MotionDiv className={`flex flex-col items-center gap-3 ${profileBannerUrl && "-mt-15"} px-4 md:hidden relative z-99`}>
                     <img
                         src={profilePictureUrl}
                         alt={displayName || "Profile"}
@@ -175,11 +177,11 @@ const Profile: React.FC = () => {
                             {numberOfTips} tips
                         </p>
                     </div>
-                </div>
+                </MotionDiv>
             )}
 
         {/* Content layout */}
-        <div className="flex flex-col md:flex-row justify-center items-center md:items-start md:justify-between gap-6 md:gap-12 mt-8 md:mt-[60px]">
+        <div className="flex flex-col md:flex-row justify-center items-center md:items-start md:justify-between gap-6 md:gap-12 mt-8 md:mt-[60px] pb-15">
           {/* Left column (About + Tips) */}
           <div className="flex flex-col justify-center gap-6 w-[90%] md:w-[500px] order-2 md:order-1">
             {/* Donate Section (mobile first, on top) */}
@@ -188,6 +190,7 @@ const Profile: React.FC = () => {
                 displayName={displayName || ""}
                 username={username || ""}
                 currency={currency || ""}
+                tubeTipValue={tubeTipValue || 3}
                 bankConnected={bankConnected}
               />
             </div>
@@ -202,13 +205,13 @@ const Profile: React.FC = () => {
                 href={`https://www.youtube.com/@${youtubeChannelName}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-md text-gray-500 italic flex items-center gap-2 hover:text-red-300 cursor-pointer mb-2 w-fit"
+                className="text-sm md:text-md text-gray-500 italic flex items-center gap-2 hover:text-red-300 cursor-pointer mb-2 w-fit"
               >
                 <LinkIcon size={16} className="text-gray-400" />
                 {`www.youtube.com/@${youtubeChannelName}`}
               </a>
 
-              <p className="text-md mt-2">{bio}</p>
+              <p className="text-sm md:text-md mt-2">{bio}</p>
             </MotionDiv >
 
             {/* Tips Section */}
@@ -224,7 +227,7 @@ const Profile: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <Tips tips={tips} />
+                  <Tips tips={tips} currency={currency} />
                   {numberOfTips > 8 && (
                     <>
                       <button
@@ -238,6 +241,7 @@ const Profile: React.FC = () => {
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
                         id={id}
+                        currency={currency}
                       />
                     </>
                   )}
@@ -254,6 +258,7 @@ const Profile: React.FC = () => {
               displayName={displayName || ""}
               username={username || ""}
               currency={currency || ""}
+              tubeTipValue={tubeTipValue || 3}
               bankConnected={bankConnected}
             />
           </MotionDiv>
@@ -270,7 +275,7 @@ const Profile: React.FC = () => {
         </h2>
     </div>
   )}
-      <ProfileFooter isLoggedInUser={isLoggedInUser} />
+      <ProfileFooter isAuthenticated={isAuthenticated} />
 
 </div>
     );

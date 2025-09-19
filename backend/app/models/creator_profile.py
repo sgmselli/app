@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.external_services.stripe import get_stripe_country_currency, get_stripe_country_code
+from app.external_services.stripe import get_stripe_country_currency, get_stripe_country_code, get_stripe_country_tube_tip_value
 from app.models.country import Country
 from app.db.base_class import Base
 from app.utils.s3 import build_s3_url
@@ -34,6 +34,10 @@ class CreatorProfile(Base):
     @property
     def get_country_code(self) -> str:
         return get_stripe_country_code(self.country)
+
+    @property
+    def get_tube_tip_value(self) -> str:
+        return get_stripe_country_tube_tip_value(self.country)
 
     @property
     def number_of_tips(self) -> int:
