@@ -56,13 +56,13 @@ jobs:
 
       - name: Build and Push Backend
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
             -t ${{ steps.tf_output.outputs.BACKEND_ECR_URL }}:latest \
             --push ./backend
 
       - name: Build and Push Frontend
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
             -t ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}:latest \
             --push ./frontend
 
