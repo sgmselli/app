@@ -64,15 +64,8 @@ resource "aws_security_group" "worker_sg" {
   }
 
   egress {
-    from_port   = 6379
-    to_port     = 6379
-    protocol    = "tcp"
-    security_groups = [aws_security_group.redis_sg.id]
-  }
-
-  egress {
-    from_port   = 443
-    to_port     = 443
+    from_port   = 0
+    to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -137,8 +130,8 @@ resource "aws_iam_role_policy" "ecs_task_permissions" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "s3:PutObject",
           "s3:GetObject",
           "s3:DeleteObject"
@@ -152,8 +145,8 @@ resource "aws_iam_role_policy" "ecs_task_permissions" {
       },
 
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ],
@@ -285,14 +278,15 @@ resource "aws_ecs_task_definition" "backend" {
 }
 
 resource "aws_ecs_task_definition" "redis" {
-    family                   = "redis-task"
-    requires_compatibilities = ["FARGATE"]
-    network_mode             = "awsvpc"
-    cpu                      = "256"
-    memory                   = "512"
-    execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  family                   = "redis-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-    container_definitions = jsonencode([
+  container_definitions = jsonencode([
+    {
       name  = "redis"
       image = "redis:7-alpine"
       portMappings = [
@@ -302,20 +296,22 @@ resource "aws_ecs_task_definition" "redis" {
           protocol      = "tcp"
         }
       ]
-    ])
+    }
+  ])
 }
 
 resource "aws_ecs_task_definition" "worker" {
-    family                   = "worker-task"
-    requires_compatibilities = ["FARGATE"]
-    network_mode             = "awsvpc"
-    cpu                      = "256"
-    memory                   = "512"
-    execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  family                   = "worker-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-    container_definitions = jsonencode([
-      name  = "worker"
-      image = "${aws_ecr_repository.backend.repository_url}:latest"
+  container_definitions = jsonencode([
+    {
+      name    = "worker"
+      image   = "${aws_ecr_repository.backend.repository_url}:latest"
       command = ["celery", "-A", "app.celery.celery_task_queue", "worker", "--loglevel=info"]
       environment = [
         {
@@ -331,7 +327,8 @@ resource "aws_ecs_task_definition" "worker" {
           value = "0"
         }
       ]
-    ])
+    }
+  ])
 }
 
 resource "aws_service_discovery_private_dns_namespace" "namespace" {
