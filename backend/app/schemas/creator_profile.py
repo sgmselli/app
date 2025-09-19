@@ -78,6 +78,7 @@ class CreatorProfileOut(BaseModel):
     number_of_tips: Optional[int] = None
     is_bank_connected: Optional[bool] = None
     currency: Optional[str] = None
+    tube_tip_value: Optional[int] = None
     created_at:  Optional[datetime] = None
     youtube_channel_name: Optional[str] = None
     profile_picture_url: Optional[str] = None

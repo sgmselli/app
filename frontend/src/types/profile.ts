@@ -46,9 +46,10 @@ export interface GetProfileResponse {
   id: number;
   creator_id: number;
   created_at: Date | null;
-  currency: string | null
-  tips: any
-  number_of_tips: number
+  currency: string | null;
+  tube_tip_value: number | null;
+  tips: any;
+  number_of_tips: number;
   youtube_channel_name: string;
   profile_picture_url: string | null;
   profile_banner_url: string | null;

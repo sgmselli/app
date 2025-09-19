@@ -13,52 +13,40 @@ stripe.api_key = settings.stripe_secret_key
 class StripeCountryDetails:
     country_code: str
     currency: str
+    tube_tip_value: int  # new field
 
 STRIPE_COUNTRY_DATA: dict[Country, StripeCountryDetails] = {
-    Country.Australia: StripeCountryDetails("AU", "aud"),
-    Country.Austria: StripeCountryDetails("AT", "eur"),
-    Country.Belgium: StripeCountryDetails("BE", "eur"),
-    Country.Brazil: StripeCountryDetails("BR", "brl"),
-    Country.Bulgaria: StripeCountryDetails("BG", "eur"),
-    Country.Canada: StripeCountryDetails("CA", "cad"),
-    Country.Cyprus: StripeCountryDetails("CY", "eur"),
-    Country.CzechRepublic: StripeCountryDetails("CZ", "czk"),
-    Country.Denmark: StripeCountryDetails("DK", "dkk"),
-    Country.Estonia: StripeCountryDetails("EE", "eur"),
-    Country.Finland: StripeCountryDetails("FI", "eur"),
-    Country.France: StripeCountryDetails("FR", "eur"),
-    Country.Germany: StripeCountryDetails("DE", "eur"),
-    Country.Ghana: StripeCountryDetails("GH", "usd"),
-    Country.Gibraltar: StripeCountryDetails("GI", "gbp"),
-    Country.Greece: StripeCountryDetails("GR", "eur"),
-    Country.HongKong: StripeCountryDetails("HK", "hkd"),
-    Country.Hungary: StripeCountryDetails("HU", "huf"),
-    Country.Indonesia: StripeCountryDetails("ID", "idr"),
-    Country.Ireland: StripeCountryDetails("IE", "eur"),
-    Country.Italy: StripeCountryDetails("IT", "eur"),
-    Country.Japan: StripeCountryDetails("JP", "jpy"),
-    Country.Kenya: StripeCountryDetails("KE", "usd"),
-    Country.Latvia: StripeCountryDetails("LV", "eur"),
-    Country.Liechtenstein: StripeCountryDetails("LI", "chf"),
-    Country.Lithuania: StripeCountryDetails("LT", "eur"),
-    Country.Luxembourg: StripeCountryDetails("LU", "eur"),
-    Country.Malta: StripeCountryDetails("MT", "eur"),
-    Country.Mexico: StripeCountryDetails("MX", "mxn"),
-    Country.Netherlands: StripeCountryDetails("NL", "eur"),
-    Country.NewZealand: StripeCountryDetails("NZ", "nzd"),
-    Country.Norway: StripeCountryDetails("NO", "nok"),
-    Country.Poland: StripeCountryDetails("PL", "pln"),
-    Country.Portugal: StripeCountryDetails("PT", "eur"),
-    Country.Romania: StripeCountryDetails("RO", "ron"),
-    Country.Singapore: StripeCountryDetails("SG", "sgd"),
-    Country.Slovakia: StripeCountryDetails("SK", "eur"),
-    Country.Slovenia: StripeCountryDetails("SI", "eur"),
-    Country.Spain: StripeCountryDetails("ES", "eur"),
-    Country.Sweden: StripeCountryDetails("SE", "sek"),
-    Country.Switzerland: StripeCountryDetails("CH", "chf"),
-    Country.Thailand: StripeCountryDetails("TH", "thb"),
-    Country.UnitedKingdom: StripeCountryDetails("GB", "gbp"),
-    Country.UnitedStates: StripeCountryDetails("US", "usd"),
+    Country.Australia: StripeCountryDetails("AU", "aud", 7),
+    Country.Austria: StripeCountryDetails("AT", "eur", 4),
+    Country.Belgium: StripeCountryDetails("BE", "eur", 4),
+    Country.Bulgaria: StripeCountryDetails("BG", "eur", 7),
+    Country.Cyprus: StripeCountryDetails("CY", "eur", 4),
+    Country.CzechRepublic: StripeCountryDetails("CZ", "czk", 85),
+    Country.Denmark: StripeCountryDetails("DK", "dkk", 26),
+    Country.Finland: StripeCountryDetails("FI", "eur", 4),
+    Country.France: StripeCountryDetails("FR", "eur", 4),
+    Country.Germany: StripeCountryDetails("DE", "eur", 4),
+    Country.Gibraltar: StripeCountryDetails("GI", "gbp", 3),
+    Country.Greece: StripeCountryDetails("GR", "eur", 4),
+    Country.Hungary: StripeCountryDetails("HU", "huf", 1348),
+    Country.Ireland: StripeCountryDetails("IE", "eur", 4),
+    Country.Italy: StripeCountryDetails("IT", "eur", 4),
+    Country.Latvia: StripeCountryDetails("LV", "eur", 4),
+    Country.Liechtenstein: StripeCountryDetails("LI", "chf", 4),
+    Country.Lithuania: StripeCountryDetails("LT", "eur", 4),
+    Country.Luxembourg: StripeCountryDetails("LU", "eur", 4),
+    Country.Malta: StripeCountryDetails("MT", "eur", 4),
+    Country.Netherlands: StripeCountryDetails("NL", "eur", 4),
+    Country.Norway: StripeCountryDetails("NO", "nok", 41),
+    Country.Poland: StripeCountryDetails("PL", "pln", 15),
+    Country.Portugal: StripeCountryDetails("PT", "eur", 4),
+    Country.Romania: StripeCountryDetails("RO", "ron", 18),
+    Country.Slovakia: StripeCountryDetails("SK", "eur", 4),
+    Country.Slovenia: StripeCountryDetails("SI", "eur", 4),
+    Country.Spain: StripeCountryDetails("ES", "eur", 4),
+    Country.Sweden: StripeCountryDetails("SE", "sek", 38),
+    Country.Switzerland: StripeCountryDetails("CH", "chf", 4),
+    Country.UnitedKingdom: StripeCountryDetails("GB", "gbp", 3),
 }
 
 def get_stripe_country_details(country: Country) -> StripeCountryDetails:
@@ -76,6 +64,12 @@ def get_stripe_country_code(country: Country) -> Optional[str]:
 def get_stripe_country_currency(country: Country) -> Optional[str]:
     try:
         return get_stripe_country_details(country).currency
+    except ValueError:
+        return None
+
+def get_stripe_country_tube_tip_value(country: Country) -> Optional[int]:
+    try:
+        return get_stripe_country_details(country).tube_tip_value
     except ValueError:
         return None
 
@@ -106,6 +100,9 @@ def create_stripe_account_link(connected_account_id: str, return_url: str, refre
         type="account_onboarding",
     )
     return account_link.url
+
+def calculate_payment_amount(number_of_tube_tips: int, tube_tip_value: int) -> int:
+    return number_of_tube_tips * tube_tip_value * 100
 
 def calculate_application_fee(amount: int, percent_fee: float) -> int:
     fee = int(amount * (percent_fee / 100))

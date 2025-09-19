@@ -8,7 +8,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   usd: "$",
   gbp: "£",
   hkd: "HK$",
-  huf: "Ft",
+  huf: "HUF ",
   inr: "₹",
   idr: "Rp",
   jpy: "¥",

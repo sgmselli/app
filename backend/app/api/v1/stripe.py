@@ -22,6 +22,7 @@ from app.utils.constants.http_error_details import (
     CREATOR_PROFILE_NOT_FOUND_ERROR
 )
 from app.utils.logging import Logger, LogLevel
+from app.external_services.stripe import calculate_payment_amount
 
 stripe.api_key = settings.stripe_secret_key
 
@@ -79,6 +80,8 @@ async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session
         username = payload.username
         profile = get_creator_profile_by_username(username=username, db=db)
 
+        payment_amount = calculate_payment_amount(payload.number_of_tube_tips, profile.get_tube_tip_value)
+
         session_url = stripe_functions.create_stripe_checkout_session_link(
             creator_profile_id=profile.id,
             username=username,
@@ -87,7 +90,7 @@ async def create_stripe_account_link(payload: StripeCheckoutPayload, db: Session
             connected_account_id=profile.stripe_account_id,
             display_name=profile.display_name,
             currency=profile.get_currency,
-            payment_amount=payload.payment_amount,
+            payment_amount=payment_amount,
             application_fee_percentage=settings.application_fee_percentage
         )
         return {"url": session_url}

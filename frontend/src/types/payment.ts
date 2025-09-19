@@ -10,7 +10,7 @@ export interface ConnectBankResponse {
 
 export interface CheckoutBankRequest {
   username: string
-  payment_amount: number
+  number_of_tube_tips: number
   name: string | null
   message: string | null
 }

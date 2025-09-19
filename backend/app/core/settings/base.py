@@ -17,13 +17,11 @@ except ValueError:
 
 class BaseAppSettings(BaseSettings):
     app_env: AppEnvTypes = selected_env
+    debug: Optional[bool] = None
     database_url: Optional[str] = None
-    frontend_url: str = "http://localhost:3000"
-    access_secret_key: str = 'None'
-    refresh_secret_key: str = 'None'
-    jwt_encryption_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
-    refresh_token_expire_days: int = 30
+    frontend_url: Optional[str] = None
+    access_secret_key: Optional[str] = None
+    refresh_secret_key: Optional[str] = None
     stripe_secret_key: Optional[str] = None
     stripe_connect_return_url: Optional[str] = None
     stripe_connect_failed_url: Optional[str] = None
@@ -32,13 +30,17 @@ class BaseAppSettings(BaseSettings):
     stripe_checkout_refresh_url: Optional[str] = None
     application_fee_percentage: float = 0.15
     stripe_webhook_secret: Optional[str] = None
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    redis_db: int = 0
-    redis_password: str | None = None
-    bucket_name: str | None = None
-    aws_region: str | None = None
+    redis_host: Optional[str] = None
+    redis_port: Optional[int] = None
+    redis_db: Optional[int] = None
+    redis_password: Optional[str] = None
     send_grid_api_key: Optional[str] = None
-    from_email: Optional[str] = None
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 30
+    jwt_encryption_algorithm: str = "HS256"
+    from_email: str = "noreply@tubetip.co"
+    aws_region = "eu-west-2"
+    bucket_name = "tubetip-dev"
+    cloud_front_url = "d357a07t61on3p.cloudfront.net"
 
 

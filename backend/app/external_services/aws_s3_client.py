@@ -20,7 +20,14 @@ class AwsS3Client:
         Logger.log(LogLevel.INFO, f"Uploading {object_name}, file - {file}")
         try:
             file.seek(0)
-            self.s3.upload_fileobj(file, self.bucket_name, object_name)
+            self.s3.upload_fileobj(
+                file,
+                self.bucket_name,
+                object_name,
+                ExtraArgs={
+                    "CacheControl": "public, max-age=31536000, immutable",
+                }
+            )
         except Exception as e:
             Logger.log(LogLevel.ERROR, e)
             return False
@@ -34,4 +41,6 @@ class AwsS3Client:
         except Exception as e:
             Logger.log(LogLevel.ERROR, f"Error deleting object {object_name}: {e}")
             return False
+
+
 

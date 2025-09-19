@@ -4,11 +4,13 @@ import type { Tip } from '../../../types/tip';
 
 interface TipsProps {
     tips: Tip[];
+    currency: string | null;
 }
 
 export interface TipProps {
     id: number;
     amount: number;
+    currency: string | null;
     name?: string | null;
     message?: string | null;
     isPrivate: boolean
@@ -25,6 +27,7 @@ const Tips: React.FC<TipsProps> = (props: TipsProps) => {
                             key={tip.id}
                             id={tip.id}
                             amount={tip.amount}
+                            currency={props.currency}
                             name={tip.name}
                             message={tip.message}
                             isPrivate={tip.isPrivate}
@@ -41,7 +44,7 @@ const Tip: React.FC<TipProps> = (props: TipProps) => {
 
     return (
         <div className="mb-6">
-            <p><span className='font-semibold'>{props.name ? props.name : "Someone"}</span> TubeTipped £{props.amount/100} 💸</p>
+            <p><span className='font-semibold'>{props.name ? props.name : "Someone"}</span> TubeTipped {props.currency}{props.amount/100} 💸</p>
             { props.message &&
                 <div className="bg-red-50 py-4 px-6 w-fit rounded-lg mt-2">
                     <p className="text-sm text-gray-700 font-normal">{props.message}</p>

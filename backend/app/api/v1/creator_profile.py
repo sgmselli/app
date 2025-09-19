@@ -55,6 +55,7 @@ async def get(username: str, db: Session = Depends(get_db), current_user: Option
             created_at=creator_profile.created_at,
             is_bank_connected=creator_profile.is_bank_connected,
             currency=creator_profile.get_currency,
+            tube_tip_value=creator_profile.get_tube_tip_value,
             tips=tips,
             number_of_tips=creator_profile.number_of_tips,
             youtube_channel_name=creator_profile.youtube_channel_name,

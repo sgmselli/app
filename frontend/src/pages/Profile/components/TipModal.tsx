@@ -7,9 +7,10 @@ interface TipsModalProps {
   isOpen: boolean;
   onClose: () => void;
   id: number | null;
+  currency: string | null;
 }
 
-export default function TipsModal({ isOpen, onClose, id }: TipsModalProps) {
+export default function TipsModal({ isOpen, onClose, id, currency }: TipsModalProps) {
   const [tips, setTips] = useState<Tip[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -51,7 +52,7 @@ export default function TipsModal({ isOpen, onClose, id }: TipsModalProps) {
         <h3 className="font-bold text-xl mb-4">Recent tips</h3>
 
         <div className="space-y-3 max-h-[80vh] overflow-y-auto">
-            <Tips tips={tips} />
+            <Tips tips={tips} currency={currency} />
         </div>
 
         {hasMore && (
