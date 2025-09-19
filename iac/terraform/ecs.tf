@@ -91,7 +91,6 @@ resource "aws_security_group" "redis_sg" {
   }
 }
 
-# IAM role for ECS tasks to pull from ECR
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
@@ -105,6 +104,33 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       Action = "sts:AssumeRole"
     }]
   })
+}
+
+resource "aws_iam_role_policy" "ecs_task_execution_policy" {
+  name = "ecs-task-execution-policy"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource = [
+          data.aws_secretsmanager_secret.stripe_api_key.arn,
+          data.aws_secretsmanager_secret.stripe_webhook_secret.arn,
+          data.aws_secretsmanager_secret.send_grid_api_key.arn,
+          data.aws_secretsmanager_secret.access_secret_key.arn,
+          data.aws_secretsmanager_secret.refresh_secret_key.arn
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = var.ecs_task_execution_policy_arn
 }
 
 resource "aws_iam_role" "ecs_task_role" {
@@ -122,8 +148,8 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-resource "aws_iam_role_policy" "ecs_task_permissions" {
-  name = "ecs-task-permissions"
+resource "aws_iam_role_policy" "ecs_task_policy" {
+  name = "ecs-task-policy"
   role = aws_iam_role.ecs_task_role.id
 
   policy = jsonencode({
@@ -143,29 +169,8 @@ resource "aws_iam_role_policy" "ecs_task_permissions" {
         Action   = ["s3:ListBucket"],
         Resource = "arn:aws:s3:::tubetip-dev"
       },
-
-      {
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ],
-        Resource = [
-          data.aws_secretsmanager_secret.stripe_api_key.arn,
-          data.aws_secretsmanager_secret.stripe_webhook_secret.arn,
-          data.aws_secretsmanager_secret.send_grid_api_key.arn,
-          data.aws_secretsmanager_secret.access_secret_key.arn,
-          data.aws_secretsmanager_secret.refresh_secret_key.arn
-        ]
-      }
     ]
   })
-}
-
-# Attach AWS-managed policy to the role
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = var.ecs_task_execution_policy_arn
 }
 
 resource "aws_cloudwatch_log_group" "ecs_frontend" {
