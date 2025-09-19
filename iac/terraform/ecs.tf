@@ -34,6 +34,7 @@ resource "aws_security_group" "frontend_sg" {
 resource "aws_security_group" "backend_sg" {
   name        = "ecs-backend-sg"
   description = "Allow only internal access to backend"
+  vpc_id      = data.aws_vpc.default.id
 
   ingress {
     from_port       = 8000
@@ -47,6 +48,53 @@ resource "aws_security_group" "backend_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "worker_sg" {
+  name        = "ecs-worker-sg"
+  description = "Allow only internal access to worker"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = []
+  }
+
+  egress {
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    security_groups = [aws_security_group.redis_sg.id]
+  }
+
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "redis_sg" {
+  name        = "ecs-redis-sg"
+  description = "Allow only internal access to redis"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.backend_sg.id, aws_security_group.worker_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
 }
 
@@ -236,12 +284,61 @@ resource "aws_ecs_task_definition" "backend" {
   ])
 }
 
+resource "aws_ecs_task_definition" "redis" {
+    family                   = "redis-task"
+    requires_compatibilities = ["FARGATE"]
+    network_mode             = "awsvpc"
+    cpu                      = "256"
+    memory                   = "512"
+    execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+
+    container_definitions = jsonencode([
+      name  = "redis"
+      image = "redis:7-alpine"
+      portMappings = [
+        {
+          containerPort = 6379
+          hostPort      = 6379
+          protocol      = "tcp"
+        }
+      ]
+    ])
+}
+
+resource "aws_ecs_task_definition" "worker" {
+    family                   = "worker-task"
+    requires_compatibilities = ["FARGATE"]
+    network_mode             = "awsvpc"
+    cpu                      = "256"
+    memory                   = "512"
+    execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+
+    container_definitions = jsonencode([
+      name  = "worker"
+      image = "${aws_ecr_repository.backend.repository_url}:latest"
+      command = ["celery", "-A", "app.celery.celery_task_queue", "worker", "--loglevel=info"]
+      environment = [
+        {
+          name  = "REDIS_HOST"
+          value = "redis.internal"
+        },
+        {
+          name  = "REDIS_PORT"
+          value = "6379"
+        },
+        {
+          name  = "REDIS_DB"
+          value = "0"
+        }
+      ]
+    ])
+}
+
 resource "aws_service_discovery_private_dns_namespace" "namespace" {
   name        = "local"
   description = "Private DNS namespace for ECS"
   vpc         = data.aws_vpc.default.id
 }
-
 
 # ECS Service (Frontend)
 resource "aws_ecs_service" "frontend" {
@@ -257,7 +354,7 @@ resource "aws_ecs_service" "frontend" {
     security_groups  = [aws_security_group.frontend_sg.id]
   }
 
-  depends_on = [aws_ecs_cluster.main]
+  depends_on = [aws_ecs_cluster.main, aws_ecs_service.backend]
 }
 
 resource "aws_service_discovery_service" "backend_discovery_service" {
@@ -293,4 +390,56 @@ resource "aws_ecs_service" "backend" {
   }
 
   depends_on = [aws_ecs_cluster.main]
+}
+
+# ECS Service (Worker)
+resource "aws_ecs_service" "worker" {
+  name            = "worker-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.worker.arn
+  launch_type     = "FARGATE"
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = data.aws_subnets.default.ids
+    assign_public_ip = false
+    security_groups  = [aws_security_group.worker_sg.id]
+  }
+
+  depends_on = [aws_ecs_cluster.main]
+}
+
+resource "aws_service_discovery_service" "redis" {
+  name = "redis"
+
+  dns_config {
+    namespace_id   = aws_service_discovery_private_dns_namespace.namespace.id
+    routing_policy = "MULTIVALUE"
+
+    dns_records {
+      type = "A"
+      ttl  = 10
+    }
+  }
+}
+
+# ECS Service (Worker)
+resource "aws_ecs_service" "redis" {
+  name            = "redis-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.redis.arn
+  launch_type     = "FARGATE"
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = data.aws_subnets.default.ids
+    assign_public_ip = false
+    security_groups  = [aws_security_group.redis_sg.id]
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.redis.arn
+  }
+
+  depends_on = [aws_ecs_cluster.main, aws_ecs_service.redis]
 }
