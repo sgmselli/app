@@ -110,9 +110,11 @@ resource "aws_iam_role_policy" "ecs_task_permissions" {
           "secretsmanager:DescribeSecret"
         ],
         Resource = [
-          aws_secretsmanager_secret.stripe_api_key.arn,
-          aws_secretsmanager_secret.stripe_webhook_secret.arn,
-          aws_secretsmanager_secret.send_grid_api_key.arn
+          data.aws_secretsmanager_secret.stripe_api_key.arn,
+          data.aws_secretsmanager_secret.stripe_webhook_secret.arn,
+          data.aws_secretsmanager_secret.send_grid_api_key.arn,
+          data.aws_secretsmanager_secret.access_secret_key.arn,
+          data.aws_secretsmanager_secret.refresh_secret_key.arn
         ]
       }
     ]
@@ -202,24 +204,24 @@ resource "aws_ecs_task_definition" "backend" {
       ],
       secrets = [
         {
-          name      = "STRIPE_API_KEY"
-          valueFrom = aws_secretsmanager_secret.stripe_api_key.arn
+          name      = "stripe_api_key"
+          valueFrom = data.aws_secretsmanager_secret.stripe_api_key.arn
         },
         {
-          name      = "STRIPE_WEBHOOK_SECRET"
-          valueFrom = aws_secretsmanager_secret.stripe_webhook_secret.arn
+          name      = "stripe_webhook_secret"
+          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
         },
         {
-          name      = "SENDGRID_API_KEY"
-          valueFrom = aws_secretsmanager_secret.send_grid_api_key.arn
+          name      = "sendgrid_api_key"
+          valueFrom = data.aws_secretsmanager_secret.send_grid_api_key.arn
         },
         {
-          name      = "ACCESS_SECRET_KEY"
-          valueFrom = aws_secretsmanager_secret.access_secret_key.arn
+          name      = "access_secret_key"
+          valueFrom = data.aws_secretsmanager_secret.access_secret_key.arn
         },
         {
-          name      = "REFRESH_SECRET_KEY"
-          valueFrom = aws_secretsmanager_secret.refresh_secret_key.arn
+          name      = "refresh_secret_key"
+          valueFrom = data.aws_secretsmanager_secret.refresh_secret_key.arn
         }
       ]
       logConfiguration = {
