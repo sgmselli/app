@@ -202,7 +202,7 @@ resource "aws_ecs_task_definition" "frontend" {
         }
       ]
       environment = [
-          {
+        {
           name  = "ENVIRONMENT"
           value = "production"
         },
