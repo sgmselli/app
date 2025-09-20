@@ -17,3 +17,7 @@ data "aws_secretsmanager_secret" "stripe_webhook_secret" {
 data "aws_secretsmanager_secret" "send_grid_api_key" {
   name = "prod-sendgrid-api-key"
 }
+
+data "aws_secretsmanager_secret" "database_url" {
+  name = "prod-database-url"
+}
