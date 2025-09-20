@@ -119,7 +119,8 @@ resource "aws_iam_role_policy" "ecs_task_execution_policy" {
           data.aws_secretsmanager_secret.stripe_webhook_secret.arn,
           data.aws_secretsmanager_secret.send_grid_api_key.arn,
           data.aws_secretsmanager_secret.access_secret_key.arn,
-          data.aws_secretsmanager_secret.refresh_secret_key.arn
+          data.aws_secretsmanager_secret.refresh_secret_key.arn,
+          data.aws_secretsmanager_secret.database_url.arn
         ]
       }
     ]
@@ -264,6 +265,10 @@ resource "aws_ecs_task_definition" "backend" {
         {
           name      = "refresh_secret_key"
           valueFrom = data.aws_secretsmanager_secret.refresh_secret_key.arn
+        },
+        {
+          name      = "database_url"
+          valueFrom = data.aws_secretsmanager_secret.database_url.arn
         }
       ]
       logConfiguration = {
