@@ -205,10 +205,6 @@ resource "aws_ecs_task_definition" "frontend" {
         {
           name  = "ENVIRONMENT"
           value = "production"
-        },
-        {
-          name  = "VITE_API_URL"
-          value = "https://www.tubetip.co/api/v1"
         }
       ],
       logConfiguration = {
