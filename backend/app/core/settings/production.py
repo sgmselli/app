@@ -2,6 +2,7 @@ from app.core.settings.app import AppSettings
 
 class ProductionSettings(AppSettings):
     debug: bool = False
+    allow_origins: list[str] = ["https://tubetip.co", "https://www.tubetip.co"],
     frontend_url: str = "https://www.tubtip.co"
     stripe_connect_return_url: str = "https://www.tubtip.co/api/v1/stripe/connect/callback"
     stripe_connect_success_url: str = "https://www.tubtip.co/bank/connect/success"

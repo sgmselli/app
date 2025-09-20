@@ -64,7 +64,6 @@ jobs:
       - name: Build and Push Frontend
         run: |
           docker buildx build \
-            --build-arg VITE_API_URL=https://www.tubetip.co/api/v1 \
             --platform linux/amd64 \
             -t ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}:latest \
             --push ./frontend

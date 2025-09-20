@@ -16,7 +16,7 @@ class AppSettings(BaseAppSettings):
     #Backend kwargs
     api_v1_prefix: str = '/api/v1'
     allowed_hosts: list[str] = ['*']
-    allow_origins: list[str] = ['http://localhost:3000', 'http://localhost:80', 'http://localhost']
+    allow_origins: list[str] = []
     allow_credentials: bool = True
     allow_methods: list[str] = ['*']
     allow_headers: list[str] = ['*']

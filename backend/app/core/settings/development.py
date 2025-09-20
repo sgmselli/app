@@ -3,6 +3,7 @@ from pydantic_settings import SettingsConfigDict
 
 class DevelopmentSettings(AppSettings):
     debug: bool = True
+    allow_origins: list[str] = ['http://localhost:3000', 'http://localhost:80', 'http://localhost']
     frontend_url: str = "http://localhost:80"
     stripe_connect_return_url: str = "http://localhost:8000/api/v1/stripe/connect/callback"
     stripe_connect_success_url: str = "http://localhost:80/bank/connect/success"
