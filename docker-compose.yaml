@@ -5,12 +5,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    # env_file:
-    #   - ./frontend/.env
+      args:
+        VITE_API_URL: "http://localhost:8000/api/v1"
     ports:
       - "80:80"
     environment:
       - ENVIRONMENT=development
+
   backend:
     container_name: backend
     build: 
