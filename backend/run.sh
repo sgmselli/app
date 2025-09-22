@@ -2,7 +2,7 @@
 
 # Running migrations and upgrades into app
 #alembic -c app/db/migrations/alembic.ini revision --autogenerate
-#alembic -c app/db/migrations/alembic.ini upgrade head
+alembic -c app/db/migrations/alembic.ini upgrade head
 
 echo "Starting Fast API backend..."
 
