@@ -116,7 +116,8 @@ resource "aws_iam_role_policy" "ecs_task_execution_policy" {
         Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
         Resource = [
           data.aws_secretsmanager_secret.stripe_api_key.arn,
-          data.aws_secretsmanager_secret.stripe_webhook_secret.arn,
+          data.aws_secretsmanager_secret.stripe_webhook_secret_checkout.arn,
+          data.aws_secretsmanager_secret.stripe_webhook_secret_connect.arn,
           data.aws_secretsmanager_secret.send_grid_api_key.arn,
           data.aws_secretsmanager_secret.access_secret_key.arn,
           data.aws_secretsmanager_secret.refresh_secret_key.arn,
@@ -251,8 +252,12 @@ resource "aws_ecs_task_definition" "backend" {
           valueFrom = data.aws_secretsmanager_secret.stripe_api_key.arn
         },
         {
-          name      = "stripe_webhook_secret"
-          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
+          name      = "stripe_webhook_secret_checkout"
+          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_checkout.arn
+        },
+        {
+          name      = "stripe_webhook_secret_connect"
+          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_connect.arn
         },
         {
           name      = "sendgrid_api_key"

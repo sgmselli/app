@@ -10,8 +10,12 @@ data "aws_secretsmanager_secret" "stripe_api_key" {
   name = "prod-stripe-api-key"
 }
 
-data "aws_secretsmanager_secret" "stripe_webhook_secret" {
-  name = "prod-stripe-webhook-secret"
+data "aws_secretsmanager_secret" "stripe_webhook_secret_checkout" {
+  name = "prod-stripe-webhook-secret-checkout"
+}
+
+data "aws_secretsmanager_secret" "stripe_webhook_secret_connect" {
+  name = "prod-stripe-webhook-secret-connect"
 }
 
 data "aws_secretsmanager_secret" "send_grid_api_key" {

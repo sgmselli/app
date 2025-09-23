@@ -109,7 +109,7 @@ async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.stripe_webhook_secret
+            payload, sig_header, settings.stripe_webhook_secret_checkout
         )
     except stripe.error.SignatureVerificationError:
         raise HTTPException(status_code=400, detail="Invalid signature")
@@ -160,7 +160,7 @@ async def webhook_connect(request: Request, db: Session = Depends(get_db)):
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.stripe_webhook_secret
+            payload, sig_header, settings.stripe_webhook_secret_connect
         )
     except stripe.error.SignatureVerificationError:
         raise HTTPException(status_code=400, detail="Invalid signature")
