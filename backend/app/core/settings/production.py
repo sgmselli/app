@@ -3,10 +3,10 @@ from app.core.settings.app import AppSettings
 class ProductionSettings(AppSettings):
     debug: bool = False
     allow_origins: list[str] = ["https://tubetip.co", "https://www.tubetip.co"]
-    frontend_url: str = "https://www.tubtip.co"
-    stripe_connect_return_url: str = "https://www.tubtip.co/api/v1/stripe/connect/callback"
-    stripe_connect_success_url: str = "https://www.tubtip.co/bank/connect/success"
-    stripe_connect_failed_url: str = "https://www.tubtip.co/bank/connect?result=cancel"
+    frontend_url: str = "https://www.tubetip.co"
+    stripe_connect_return_url: str = "https://www.tubetip.co/api/v1/stripe/connect/callback"
+    stripe_connect_success_url: str = "https://www.tubetip.co/bank/connect/success"
+    stripe_connect_failed_url: str = "https://www.tubetip.co/bank/connect?result=cancel"
     application_fee_percentage: float = 0.15
     redis_host: str = "localhost"
     redis_port: int = 6379
