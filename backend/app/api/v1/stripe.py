@@ -24,7 +24,7 @@ from app.utils.constants.http_error_details import (
 from app.utils.logging import Logger, LogLevel
 from app.external_services.stripe import calculate_payment_amount
 
-stripe.api_key = settings.stripe_secret_key
+stripe.api_key = settings.stripe_api_key
 
 router = APIRouter()
 
