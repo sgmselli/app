@@ -7,7 +7,7 @@ from app.core import settings
 from app.utils.logging import Logger, LogLevel
 from app.models.country import Country
 
-stripe.api_key = settings.stripe_secret_key
+stripe.api_key = settings.stripe_api_key
 
 @dataclass(frozen=True)
 class StripeCountryDetails:

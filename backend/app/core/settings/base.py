@@ -22,7 +22,7 @@ class BaseAppSettings(BaseSettings):
     frontend_url: Optional[str] = None
     access_secret_key: Optional[str] = None
     refresh_secret_key: Optional[str] = None
-    stripe_secret_key: Optional[str] = None
+    stripe_api_key: Optional[str] = None
     stripe_connect_return_url: Optional[str] = None
     stripe_connect_failed_url: Optional[str] = None
     stripe_connect_success_url: Optional[str] = None
