@@ -55,12 +55,11 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({
       <div className="lg:hidden">
         {isAuthenticated() ? (
           <div className="dropdown dropdown-end">
-            <button tabIndex={0} className="btn btn-ghost btn-circle">
+            <button className="btn btn-ghost btn-circle dropdown-toggle">
               <Menu size={24} />
             </button>
             <ul
-              tabIndex={0}
-              className="menu dropdown-content mt-3 w-48 rounded-lg bg-base-100 shadow z-[1]"
+              className="menu dropdown-content mt-3 w-48 rounded-lg bg-base-100 shadow z-99"
             >
               <li>
                 <CopyUrl username={username} />
