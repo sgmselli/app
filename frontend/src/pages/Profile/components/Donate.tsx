@@ -54,7 +54,7 @@ const Donate: React.FC<Props> = (props: Props) => {
         <div className="max-w-xl">
             <form onSubmit={handleSubmit} className='w-full'>
                 <h2 className="text-lg md:text-2xl text-gray-700 font-semibold mb-2">Give <span >{props.displayName}</span> a TubeTip</h2>
-                <h4 className="text-sm md:text-lg font-normal text-gray-500">{props.bankConnected ? `A TubeTip is a friendly way of giving support to your hard working content creator. 1 TubeTip = ${props.currency}${props.tubeTipValue}.` : `Oh no! ${props.displayName} cannot current accept TubeTips until they complete their profile.`}</h4>
+                <h4 className="text-sm md:text-lg font-normal text-gray-500">{props.bankConnected ? `A TubeTip is a friendly way of giving support to your hard working content creator. 1 TubeTip = ${props.currency}${props.tubeTipValue}.` : `Oh no! ${props.displayName} cannot currently accept TubeTips until they connect their payment details.`}</h4>
 
                 {
                     props.bankConnected && (
