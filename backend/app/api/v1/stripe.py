@@ -158,6 +158,9 @@ async def webhook_connect(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig_header = request.headers.get("Stripe-Signature")
 
+    Logger.log(LogLevel.DEBUG, "Webhook call")
+
+
     try:
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.stripe_webhook_secret_connect
@@ -167,11 +170,17 @@ async def webhook_connect(request: Request, db: Session = Depends(get_db)):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid payload")
 
+    Logger.log(LogLevel.DEBUG, "Webhook call")
+    Logger.log(LogLevel.DEBUG, event["type"])
+
+
     if event["type"] == "account.updated":
         account = event["data"]["object"]
         stripe_account_id = account["id"]
         charges_enabled = account["charges_enabled"]
         payouts_enabled = account["payouts_enabled"]
+
+        Logger.log(LogLevel.DEBUG, charges_enabled)
 
         if charges_enabled:
             profile = (
