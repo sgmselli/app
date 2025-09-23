@@ -29,7 +29,8 @@ class BaseAppSettings(BaseSettings):
     stripe_checkout_return_url: Optional[str] = None
     stripe_checkout_refresh_url: Optional[str] = None
     application_fee_percentage: float = 0.15
-    stripe_webhook_secret: Optional[str] = None
+    stripe_webhook_secret_checkout: Optional[str] = None
+    stripe_webhook_secret_connect: Optional[str] = None
     redis_host: Optional[str] = None
     redis_port: Optional[int] = None
     redis_db: Optional[int] = None
