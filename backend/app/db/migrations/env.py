@@ -13,7 +13,8 @@ from app.core import settings
 config = context.config
 
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", settings.database_url)
+db_url_escaped = settings.database_url.replace('%', '%%')
+config.set_main_option('sqlalchemy.url', db_url_escaped)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
