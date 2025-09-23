@@ -165,7 +165,7 @@ const Profile: React.FC = () => {
         )}
 
         {profilePictureUrl && (
-                <MotionDiv className={`flex flex-col items-center gap-3 ${profileBannerUrl && "-mt-15"} px-4 md:hidden relative z-99`}>
+                <MotionDiv className={`flex flex-col items-center gap-3 ${profileBannerUrl && "-mt-15"} px-4 md:hidden relative z-50`}>
                     <img
                         src={profilePictureUrl}
                         alt={displayName || "Profile"}
