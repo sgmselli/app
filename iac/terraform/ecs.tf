@@ -299,7 +299,7 @@ resource "aws_ecs_task_definition" "redis" {
   container_definitions = jsonencode([
     {
       name  = "redis"
-      image = "redis:7-alpine"
+      image = "${aws_ecr_repository.redis.repository_url}:7-alpine"
       portMappings = [
         {
           containerPort = 6379
