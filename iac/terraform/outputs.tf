@@ -17,6 +17,6 @@ output "backend_ecr_url" {
 }
 
 output "redis_ecr_url" {
-  value = aws_ecr_repository.redis.repository_url
+  value     = aws_ecr_repository.redis.repository_url
   sensitive = false
 }

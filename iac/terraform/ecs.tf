@@ -183,6 +183,11 @@ resource "aws_cloudwatch_log_group" "ecs_backend" {
   retention_in_days = 1
 }
 
+resource "aws_cloudwatch_log_group" "ecs_worker" {
+  name              = "/ecs/worker"
+  retention_in_days = 1
+}
+
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "frontend-task"
   requires_compatibilities = ["FARGATE"]
@@ -338,6 +343,44 @@ resource "aws_ecs_task_definition" "worker" {
           value = "0"
         }
       ]
+      secrets = [
+        {
+          name      = "stripe_api_key"
+          valueFrom = data.aws_secretsmanager_secret.stripe_api_key.arn
+        },
+        {
+          name      = "stripe_webhook_secret_checkout"
+          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_checkout.arn
+        },
+        {
+          name      = "stripe_webhook_secret_connect"
+          valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_connect.arn
+        },
+        {
+          name      = "sendgrid_api_key"
+          valueFrom = data.aws_secretsmanager_secret.send_grid_api_key.arn
+        },
+        {
+          name      = "access_secret_key"
+          valueFrom = data.aws_secretsmanager_secret.access_secret_key.arn
+        },
+        {
+          name      = "refresh_secret_key"
+          valueFrom = data.aws_secretsmanager_secret.refresh_secret_key.arn
+        },
+        {
+          name      = "database_url"
+          valueFrom = data.aws_secretsmanager_secret.database_url.arn
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_worker.name,
+          awslogs-region        = var.region,
+          awslogs-stream-prefix = "worker"
+        }
+      }
     }
   ])
 }

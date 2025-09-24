@@ -8,7 +8,7 @@ class ProductionSettings(AppSettings):
     stripe_connect_success_url: str = "https://www.tubetip.co/bank/connect/success"
     stripe_connect_failed_url: str = "https://www.tubetip.co/bank/connect?result=cancel"
     application_fee_percentage: float = 0.15
-    redis_host: str = "localhost"
+    redis_host: str = "redis.local"
     redis_port: int = 6379
     redis_db: int = 0
 
