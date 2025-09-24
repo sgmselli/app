@@ -327,7 +327,7 @@ resource "aws_ecs_task_definition" "worker" {
       environment = [
         {
           name  = "REDIS_HOST"
-          value = "redis.internal"
+          value = "redis.local"
         },
         {
           name  = "REDIS_PORT"
@@ -413,7 +413,7 @@ resource "aws_ecs_service" "worker" {
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
-    assign_public_ip = false
+    assign_public_ip = true
     security_groups  = [aws_security_group.worker_sg.id]
   }
 
