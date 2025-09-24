@@ -443,7 +443,7 @@ resource "aws_ecs_service" "redis" {
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
-    assign_public_ip = false
+    assign_public_ip = true
     security_groups  = [aws_security_group.redis_sg.id]
   }
 
