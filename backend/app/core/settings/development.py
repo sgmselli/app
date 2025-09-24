@@ -14,5 +14,6 @@ class DevelopmentSettings(AppSettings):
     redis_db: int = 0
 
     model_config = SettingsConfigDict(
-        env_file='.env'
+        env_file='.env',
+        extra="ignore"
     )
