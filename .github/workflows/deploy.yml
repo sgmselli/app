@@ -46,6 +46,7 @@ jobs:
         run: |
           echo "FRONTEND_ECR_URL=$(terraform output -raw frontend_ecr_url)" >> $GITHUB_OUTPUT
           echo "BACKEND_ECR_URL=$(terraform output -raw backend_ecr_url)" >> $GITHUB_OUTPUT
+          echo "REDIS_ECR_URL=$(terraform output -raw redis_ecr_url)" >> $GITHUB_OUTPUT
         working-directory: iac/terraform
 
       - name: Log in to Amazon ECR
@@ -68,6 +69,12 @@ jobs:
             -t ${{ steps.tf_output.outputs.FRONTEND_ECR_URL }}:latest \
             --push ./frontend
 
+      - name: Push Redis to ECR
+        run: |
+          docker pull redis:7-alpine
+          docker tag redis:7-alpine ${{ steps.tf_output.outputs.REDIS_ECR_URL }}:7-alpine
+          docker push ${{ steps.tf_output.outputs.REDIS_ECR_URL }}:7-alpine
+
       - name: Force ECS backend service to redeploy
         run: |
           aws ecs update-service \
@@ -81,5 +88,13 @@ jobs:
           aws ecs update-service \
             --cluster $ECS_CLUSTER_NAME \
             --service frontend-service \
+            --force-new-deployment \
+            --region $AWS_REGION
+
+      - name: Force ECS redis service to redeploy
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER_NAME \
+            --service redis-service \
             --force-new-deployment \
             --region $AWS_REGION

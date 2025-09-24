@@ -451,5 +451,5 @@ resource "aws_ecs_service" "redis" {
     registry_arn = aws_service_discovery_service.redis.arn
   }
 
-  depends_on = [aws_ecs_cluster.main, aws_ecs_service.redis]
+  depends_on = [aws_ecs_cluster.main]
 }
