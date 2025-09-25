@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 import stripe
 
-from app.celery.tasks import task_send_payment_success_email
+from app.celery.tasks import task_send_payment_success_to_supporter_email, task_send_payment_success_to_creator_email
 from app.core import settings
 from app.crud.creator_profile import get_creator_profile_by_username, get_creator_profile_by_id
 from app.external_services import stripe as stripe_functions 
@@ -143,10 +143,19 @@ async def webhook_checkout(request: Request, db: Session = Depends(get_db)):
         create_tip(db=db, tip_data=tip_data)
 
         profile = get_creator_profile_by_id(db, creator_profile_id)
+        creator_email = profile.creator.email
 
-        task_send_payment_success_email.delay(
+        task_send_payment_success_to_supporter_email.delay(
             to_email=email,
             display_name=profile.display_name,
+            amount=str(amount/100),
+            currency=currency
+        )
+
+        task_send_payment_success_to_creator_email.delay(
+            to_email=creator_email,
+            display_name=profile.display_name,
+            supporter_email=creator_email,
             amount=str(amount/100),
             currency=currency
         )
