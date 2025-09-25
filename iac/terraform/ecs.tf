@@ -265,7 +265,7 @@ resource "aws_ecs_task_definition" "backend" {
           valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_connect.arn
         },
         {
-          name      = "sendgrid_api_key"
+          name      = "send_grid_api_key"
           valueFrom = data.aws_secretsmanager_secret.send_grid_api_key.arn
         },
         {
@@ -357,7 +357,7 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = data.aws_secretsmanager_secret.stripe_webhook_secret_connect.arn
         },
         {
-          name      = "sendgrid_api_key"
+          name      = "send_grid_api_key"
           valueFrom = data.aws_secretsmanager_secret.send_grid_api_key.arn
         },
         {
