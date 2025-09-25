@@ -174,7 +174,7 @@ const Profile: React.FC = () => {
                     <div className='text-center'>
                         <h2 className="text-lg font-semibold">{displayName}</h2>
                         <p className="text-sm text-gray-500">
-                            {numberOfTips === undefined || numberOfTips !== 1 ? "tips" : "tip"}
+                            {numberOfTips} {numberOfTips === undefined || numberOfTips !== 1 ? "tips" : "tip"}
                         </p>
                     </div>
                 </MotionDiv>
